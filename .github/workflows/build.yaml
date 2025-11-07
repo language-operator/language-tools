@@ -22,7 +22,7 @@ env:
   IMAGE_PREFIX: language-operator
 
 jobs:
-  # Build tool images (web, email)
+  # Build tool images (web, email, filesystem)
   build-tools:
     runs-on: builder
     permissions:
@@ -30,7 +30,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        tool: [web, email]
+        tool: [web, email, filesystem]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

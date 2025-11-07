@@ -10,9 +10,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Test web tool
-  web-tool-test:
+  test-tools:
     runs-on: builder
+    strategy:
+      matrix:
+        tool: [web, email, filesystem]
     steps:
       - name: Checkout code
         uses: https://github.com/actions/checkout@v4
@@ -25,35 +27,11 @@ jobs:
           BUNDLE_GIT__THERYANS__IO: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Install dependencies
-        working-directory: web
+        working-directory: ${{ matrix.tool }}
         run: bundle install
         env:
           BUNDLE_GIT__THERYANS__IO: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Run tests
-        working-directory: web
-        run: bundle exec rspec --format documentation
-
-  # Test email tool
-  email-tool-test:
-    runs-on: builder
-    steps:
-      - name: Checkout code
-        uses: https://github.com/actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: https://github.com/ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4'
-        env:
-          BUNDLE_GIT__THERYANS__IO: ${{ secrets.REGISTRY_TOKEN }}
-
-      - name: Install dependencies
-        working-directory: email
-        run: bundle install
-        env:
-          BUNDLE_GIT__THERYANS__IO: ${{ secrets.REGISTRY_TOKEN }}
-
-      - name: Run tests
-        working-directory: email
+        working-directory: ${{ matrix.tool }}
         run: bundle exec rspec --format documentation
