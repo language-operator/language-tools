@@ -1,7 +1,64 @@
 ---
 version: '1.0'
-generated: '2025-11-07T02:36:05Z'
+generated: '2025-11-07T22:10:00Z'
 tools:
+  k8s:
+    name: k8s
+    displayName: Kubernetes Tool
+    description: Native Kubernetes operations - manage resources, pods, logs, and CRDs
+    image: git.theryans.io/language-operator/k8s-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    rbac:
+      clusterRole:
+        rules:
+        - apiGroups:
+          - "*"
+          resources:
+          - "*"
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - configmaps
+          - secrets
+          verbs:
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          - daemonsets
+          verbs:
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - pods/log
+          - pods/exec
+          verbs:
+          - get
+          - create
+    egress:
+    - description: Allow access to Kubernetes API server
+      dns:
+      - kubernetes.default.svc.cluster.local
+      ports:
+      - port: 443
+        protocol: TCP
   email:
     name: email
     displayName: Email Tool
@@ -52,3 +109,7 @@ tools:
     alias: web
   http:
     alias: web
+  kubectl:
+    alias: k8s
+  kubernetes:
+    alias: k8s

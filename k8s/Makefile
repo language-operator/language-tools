@@ -1,0 +1,25 @@
+# K8s Tool Makefile
+# This Makefile uses the shared tools.mk for common targets
+
+# Image configuration
+IMAGE_NAME := git.theryans.io/language-operator/k8s-tool
+TOOL_NAME := k8s
+
+# Include shared targets
+include ../tools.mk
+
+# K8s-specific test target
+.PHONY: test
+test:
+	@echo "Testing health endpoint..."
+	@curl -s http://localhost:8080/health | jq .
+	@echo ""
+	@echo "Initializing MCP session..."
+	@curl -s -X POST http://localhost:8080/mcp \
+		-H "Content-Type: application/json" \
+		-d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' | jq '.result.serverInfo'
+	@echo ""
+	@echo "Listing available tools via MCP..."
+	@curl -s -X POST http://localhost:8080/mcp \
+		-H "Content-Type: application/json" \
+		-d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | jq '.result.tools[] | {name, description}'

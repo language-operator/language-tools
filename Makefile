@@ -12,6 +12,8 @@ help:
 	@echo "  clean        - Remove generated index.yaml"
 	@echo ""
 	@echo "Individual tool targets:"
+	@echo "  k8s-build    - Build k8s tool image"
+	@echo "  k8s-push     - Push k8s tool image"
 	@echo "  email-build  - Build email tool image"
 	@echo "  email-push   - Push email tool image"
 	@echo "  web-build    - Build web tool image"
@@ -36,6 +38,7 @@ clean:
 # Build all tool images
 build-all:
 	@echo "Building all tool images..."
+	@$(MAKE) -C k8s build
 	@$(MAKE) -C email build
 	@$(MAKE) -C web build
 	@echo "✓ All tools built successfully"
@@ -43,11 +46,18 @@ build-all:
 # Push all tool images
 push-all:
 	@echo "Pushing all tool images..."
+	@$(MAKE) -C k8s push
 	@$(MAKE) -C email push
 	@$(MAKE) -C web push
 	@echo "✓ All tools pushed successfully"
 
 # Individual tool targets
+k8s-build:
+	@$(MAKE) -C k8s build
+
+k8s-push:
+	@$(MAKE) -C k8s push
+
 email-build:
 	@$(MAKE) -C email build
 

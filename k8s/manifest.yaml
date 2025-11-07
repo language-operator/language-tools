@@ -1,0 +1,43 @@
+name: k8s
+displayName: Kubernetes Tool
+description: Native Kubernetes operations - manage resources, pods, logs, and CRDs
+image: git.theryans.io/language-operator/k8s-tool:latest
+deploymentMode: service
+port: 80
+type: mcp
+
+# RBAC configuration for Kubernetes API access
+rbac:
+  # ServiceAccount will be created automatically
+  # The agent's ServiceAccount will be used for all operations
+  clusterRole:
+    rules:
+      # Allow reading all resources
+      - apiGroups: ["*"]
+        resources: ["*"]
+        verbs: ["get", "list", "watch"]
+      # Allow managing common resources
+      - apiGroups: [""]
+        resources: ["pods", "services", "configmaps", "secrets"]
+        verbs: ["create", "update", "patch", "delete"]
+      - apiGroups: ["apps"]
+        resources: ["deployments", "statefulsets", "daemonsets"]
+        verbs: ["create", "update", "patch", "delete"]
+      # Allow pod exec and logs
+      - apiGroups: [""]
+        resources: ["pods/log", "pods/exec"]
+        verbs: ["get", "create"]
+
+# Network egress configuration
+egress:
+  - description: Allow access to Kubernetes API server
+    dns:
+      - "kubernetes.default.svc.cluster.local"
+    ports:
+      - port: 443
+        protocol: TCP
+
+# Optional aliases for this tool
+aliases:
+  - kubectl
+  - kubernetes
