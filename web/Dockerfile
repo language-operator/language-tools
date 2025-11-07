@@ -1,5 +1,8 @@
 FROM git.theryans.io/language-operator/base:latest
 
+# Ensure we're running as root for installation
+USER root
+
 # Install Ruby, build dependencies, and HTTP tools
 RUN apk add --no-cache \
     ruby \
@@ -9,6 +12,7 @@ RUN apk add --no-cache \
     curl \
     ca-certificates
 
+# Set up app directory for bundle install
 WORKDIR /app
 
 # Copy Gemfile and install dependencies
@@ -18,10 +22,11 @@ COPY Gemfile /app/
 RUN bundle install --no-cache
 
 # Copy web tools to /mcp
+WORKDIR /mcp
 COPY tools/ /mcp/
 
 # Ensure directories are owned by langop user
-RUN chown -R langop:langop /mcp /app
+RUN chown -R langop:langop /mcp
 
 # Switch to langop user
 USER langop
