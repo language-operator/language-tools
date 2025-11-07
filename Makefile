@@ -1,0 +1,61 @@
+.PHONY: help build validate clean build-all push-all
+
+# Default target
+help:
+	@echo "Language Operator Tools - Makefile"
+	@echo ""
+	@echo "Targets:"
+	@echo "  build        - Compile index.yaml from tool manifests"
+	@echo "  validate     - Validate all tool manifests"
+	@echo "  build-all    - Build all tool Docker images"
+	@echo "  push-all     - Push all tool Docker images"
+	@echo "  clean        - Remove generated index.yaml"
+	@echo ""
+	@echo "Individual tool targets:"
+	@echo "  email-build  - Build email tool image"
+	@echo "  email-push   - Push email tool image"
+	@echo "  web-build    - Build web tool image"
+	@echo "  web-push     - Push web tool image"
+
+# Compile index.yaml from all tool manifests
+build:
+	@echo "Compiling tool registry index..."
+	@ruby scripts/compile-index.rb
+
+# Validate manifests without generating index
+validate:
+	@echo "Validating tool manifests..."
+	@ruby scripts/compile-index.rb
+
+# Clean generated files
+clean:
+	@echo "Cleaning generated files..."
+	@rm -f index.yaml
+	@echo "✓ Removed index.yaml"
+
+# Build all tool images
+build-all:
+	@echo "Building all tool images..."
+	@$(MAKE) -C email build
+	@$(MAKE) -C web build
+	@echo "✓ All tools built successfully"
+
+# Push all tool images
+push-all:
+	@echo "Pushing all tool images..."
+	@$(MAKE) -C email push
+	@$(MAKE) -C web push
+	@echo "✓ All tools pushed successfully"
+
+# Individual tool targets
+email-build:
+	@$(MAKE) -C email build
+
+email-push:
+	@$(MAKE) -C email push
+
+web-build:
+	@$(MAKE) -C web build
+
+web-push:
+	@$(MAKE) -C web push

@@ -1,0 +1,31 @@
+name: web
+displayName: Web Tool
+description: Search the web and fetch web pages using DuckDuckGo
+image: git.theryans.io/language-operator/web-tool:latest
+deploymentMode: service
+port: 8080
+type: mcp
+
+# Network egress configuration
+egress:
+  - description: Allow HTTPS to DuckDuckGo
+    dns:
+      - "*.duckduckgo.com"
+      - "duckduckgo.com"
+    ports:
+      - port: 443
+        protocol: TCP
+  - description: Allow HTTPS to any web destination
+    dns:
+      - "*"
+    ports:
+      - port: 443
+        protocol: TCP
+      - port: 80
+        protocol: TCP
+
+# Optional aliases for this tool
+aliases:
+  - web-search
+  - web-fetch
+  - http
