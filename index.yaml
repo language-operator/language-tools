@@ -1,6 +1,6 @@
 ---
 version: '1.0'
-generated: '2025-11-07T01:44:10Z'
+generated: '2025-11-07T02:36:05Z'
 tools:
   email:
     name: email
@@ -8,7 +8,7 @@ tools:
     description: Send and receive emails via SMTP/IMAP
     image: git.theryans.io/language-operator/email-tool:latest
     deploymentMode: service
-    port: 8080
+    port: 80
     type: mcp
     authRequired: true
     egress:
@@ -28,7 +28,7 @@ tools:
     description: Search the web and fetch web pages using DuckDuckGo
     image: git.theryans.io/language-operator/web-tool:latest
     deploymentMode: service
-    port: 8080
+    port: 80
     type: mcp
     egress:
     - description: Allow HTTPS to DuckDuckGo

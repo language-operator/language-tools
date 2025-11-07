@@ -3,7 +3,7 @@ displayName: Web Tool
 description: Search the web and fetch web pages using DuckDuckGo
 image: git.theryans.io/language-operator/web-tool:latest
 deploymentMode: service
-port: 8080
+port: 80
 type: mcp
 
 # Network egress configuration
