@@ -1,7 +1,9 @@
+# Email Tool Makefile
+# This Makefile uses the shared tools.mk for common targets
+
 # Image configuration
 IMAGE_NAME := git.theryans.io/language-operator/email-tool
-IMAGE_TAG := latest
-IMAGE_FULL := $(IMAGE_NAME):$(IMAGE_TAG)
+TOOL_NAME := email
 
 # SMTP configuration for testing (override these)
 SMTP_HOST ?= smtp.example.com
@@ -10,7 +12,18 @@ SMTP_USER ?= user@example.com
 SMTP_PASSWORD ?= password
 SMTP_FROM ?= $(SMTP_USER)
 
-# Default target
+# Docker environment variables for SMTP
+EXTRA_DOCKER_ENV := \
+	-e SMTP_HOST=$(SMTP_HOST) \
+	-e SMTP_PORT=$(SMTP_PORT) \
+	-e SMTP_USER=$(SMTP_USER) \
+	-e SMTP_PASSWORD=$(SMTP_PASSWORD) \
+	-e SMTP_FROM=$(SMTP_FROM)
+
+# Include shared targets
+include ../tools.mk
+
+# Override help to add SMTP configuration info
 .PHONY: help
 help:
 	@echo "Available targets:"
@@ -18,9 +31,9 @@ help:
 	@echo "  scan      - Scan the Docker image with Trivy"
 	@echo "  shell     - Run the image and exec into it with an interactive shell"
 	@echo "  env       - Display sorted list of environment variables in the image"
-	@echo "  run       - Run the email MCP server on port 8080"
+	@echo "  run       - Run the $(TOOL_NAME) MCP server on port 8080"
 	@echo "  spec      - Run RSpec unit tests"
-	@echo "  test      - Run the server and test the email endpoints"
+	@echo "  test      - Run the server and test the $(TOOL_NAME) endpoints"
 	@echo "  lint      - Run RuboCop linter"
 	@echo "  lint-fix  - Auto-fix RuboCop issues"
 	@echo "  doc       - Generate YARD documentation"
@@ -35,51 +48,7 @@ help:
 	@echo "  SMTP_PASSWORD - SMTP password"
 	@echo "  SMTP_FROM     - Default from address"
 
-# Build the Docker image
-.PHONY: build
-build:
-	docker build \
-		-t $(IMAGE_FULL) .
-
-# Scan the Docker image with Trivy
-.PHONY: scan
-scan:
-	trivy image $(IMAGE_FULL)
-
-# Run the image and exec into it with an interactive shell
-.PHONY: shell
-shell:
-	docker run --rm -it \
-		-e SMTP_HOST=$(SMTP_HOST) \
-		-e SMTP_PORT=$(SMTP_PORT) \
-		-e SMTP_USER=$(SMTP_USER) \
-		-e SMTP_PASSWORD=$(SMTP_PASSWORD) \
-		-e SMTP_FROM=$(SMTP_FROM) \
-		$(IMAGE_FULL) /bin/sh
-
-# Display sorted list of environment variables in the image
-.PHONY: env
-env:
-	docker run --rm $(IMAGE_FULL) /bin/sh -c 'env | sort'
-
-# Run the MCP server
-.PHONY: run
-run:
-	docker run --rm -p 8080:80 \
-		-e SMTP_HOST=$(SMTP_HOST) \
-		-e SMTP_PORT=$(SMTP_PORT) \
-		-e SMTP_USER=$(SMTP_USER) \
-		-e SMTP_PASSWORD=$(SMTP_PASSWORD) \
-		-e SMTP_FROM=$(SMTP_FROM) \
-		--name email-server $(IMAGE_FULL)
-
-# Run RSpec unit tests
-.PHONY: spec
-spec:
-	@echo "Running RSpec unit tests..."
-	bundle exec rspec --format documentation
-
-# Test the server endpoints using MCP JSON-RPC protocol
+# Email-specific test target
 .PHONY: test
 test:
 	@echo "Testing health endpoint..."
@@ -104,40 +73,3 @@ test:
 	@echo "  curl -X POST http://localhost:8080/mcp \\"
 	@echo "    -H 'Content-Type: application/json' \\"
 	@echo "    -d '{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"send_email\",\"arguments\":{\"to\":\"recipient@example.com\",\"subject\":\"Test\",\"body\":\"Hello World\"}}}'"
-
-# Lint Ruby code
-.PHONY: lint
-lint:
-	@echo "Running RuboCop linter..."
-	bundle exec rubocop
-
-# Auto-fix linting issues
-.PHONY: lint-fix
-lint-fix:
-	@echo "Auto-fixing RuboCop issues..."
-	bundle exec rubocop -A
-
-# Generate documentation
-.PHONY: doc
-doc:
-	@echo "Generating documentation with YARD..."
-	bundle exec yard doc
-	@echo "Documentation generated in doc/"
-
-# Serve documentation
-.PHONY: doc-serve
-doc-serve: doc
-	@echo "Serving documentation at http://localhost:8808"
-	bundle exec yard server --reload
-
-# Clean documentation
-.PHONY: doc-clean
-doc-clean:
-	@echo "Cleaning documentation..."
-	rm -rf doc/ .yardoc
-
-# Clean all generated files
-.PHONY: clean
-clean: doc-clean
-	@echo "Cleaning all generated files..."
-	rm -rf vendor/ .bundle/ Gemfile.lock

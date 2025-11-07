@@ -1,5 +1,65 @@
 # Web search and scraping tools for MCP
 
+# Helper methods for web tools
+module WebHelpers
+  # Content truncation limit for text output
+  CONTENT_TRUNCATION_LIMIT = 2000
+
+  # HTML stripping patterns
+  HTML_STRIP_PATTERNS = [
+    /<script[^>]*>.*?<\/script>/im,
+    /<style[^>]*>.*?<\/style>/im,
+    /<[^>]+>/
+  ].freeze
+
+  # Common HTTP status codes
+  HTTP_STATUS_CODES = {
+    200 => "OK",
+    301 => "Moved Permanently",
+    302 => "Found (Redirect)",
+    304 => "Not Modified",
+    400 => "Bad Request",
+    401 => "Unauthorized",
+    403 => "Forbidden",
+    404 => "Not Found",
+    500 => "Internal Server Error",
+    502 => "Bad Gateway",
+    503 => "Service Unavailable"
+  }.freeze
+
+  # Validate HTTP/HTTPS URL
+  # @param url [String] URL to validate
+  # @return [String, nil] Error message if invalid, nil if valid
+  def self.validate_http_url(url)
+    return nil if url =~ /^https?:\/\//
+    "Error: Invalid URL. Must start with http:// or https://"
+  end
+
+  # Strip HTML tags and normalize whitespace
+  # @param content [String] HTML content
+  # @return [String] Plain text content
+  def self.strip_html_and_normalize(content)
+    HTML_STRIP_PATTERNS.reduce(content) { |text, pattern| text.gsub(pattern, ' ') }
+      .gsub(/\s+/, ' ')
+      .strip
+  end
+
+  # Truncate content with ellipsis if needed
+  # @param text [String] Text to truncate
+  # @param limit [Integer] Maximum length
+  # @return [String] Truncated text
+  def self.truncate_content(text, limit = CONTENT_TRUNCATION_LIMIT)
+    text.length > limit ? "#{text[0...limit]}..." : text
+  end
+
+  # Get status code description
+  # @param status [Integer] HTTP status code
+  # @return [String] Status description
+  def self.status_description(status)
+    HTTP_STATUS_CODES.fetch(status, "Unknown")
+  end
+end
+
 tool "web_search" do
   description "Search the web using DuckDuckGo and return results"
 
@@ -78,9 +138,8 @@ tool "web_fetch" do
     return_html = params["html"] || false
 
     # Validate URL
-    unless url =~ /^https?:\/\//
-      next "Error: Invalid URL. Must start with http:// or https://"
-    end
+    error = WebHelpers.validate_http_url(url)
+    next error if error
 
     # Fetch the URL using SDK HTTP client
     response = LanguageOperator::Dsl::HTTP.get(url, headers: { 'User-Agent' => 'Mozilla/5.0' }, follow_redirects: true)
@@ -95,16 +154,13 @@ tool "web_fetch" do
       content
     else
       # Strip HTML tags for text-only output
-      text = content.gsub(/<script[^>]*>.*?<\/script>/im, '')
-                   .gsub(/<style[^>]*>.*?<\/style>/im, '')
-                   .gsub(/<[^>]+>/, ' ')
-                   .gsub(/\s+/, ' ')
-                   .strip
+      text = WebHelpers.strip_html_and_normalize(content)
 
       if text.empty?
         "No text content found at: #{url}"
       else
-        "Content from #{url}:\n\n#{text[0..2000]}#{text.length > 2000 ? '...' : ''}"
+        truncated = WebHelpers.truncate_content(text)
+        "Content from #{url}:\n\n#{truncated}"
       end
     end
   end
@@ -123,9 +179,8 @@ tool "web_headers" do
     url = params["url"]
 
     # Validate URL
-    unless url =~ /^https?:\/\//
-      next "Error: Invalid URL. Must start with http:// or https://"
-    end
+    error = WebHelpers.validate_http_url(url)
+    next error if error
 
     # Fetch headers using SDK HTTP client
     response = LanguageOperator::Dsl::HTTP.head(url)
@@ -152,29 +207,14 @@ tool "web_status" do
     url = params["url"]
 
     # Validate URL
-    unless url =~ /^https?:\/\//
-      next "Error: Invalid URL. Must start with http:// or https://"
-    end
+    error = WebHelpers.validate_http_url(url)
+    next error if error
 
     # Get status code using SDK HTTP client (don't follow redirects to get actual status)
     response = LanguageOperator::Dsl::HTTP.get(url, follow_redirects: false)
 
     status = response[:status] || 0
-
-    status_text = case status
-    when 200 then "OK"
-    when 301 then "Moved Permanently"
-    when 302 then "Found (Redirect)"
-    when 304 then "Not Modified"
-    when 400 then "Bad Request"
-    when 401 then "Unauthorized"
-    when 403 then "Forbidden"
-    when 404 then "Not Found"
-    when 500 then "Internal Server Error"
-    when 502 then "Bad Gateway"
-    when 503 then "Service Unavailable"
-    else "Unknown"
-    end
+    status_text = WebHelpers.status_description(status)
 
     "Status for #{url}: #{status} #{status_text}"
   end
