@@ -14,7 +14,7 @@ jobs:
     runs-on: builder
     strategy:
       matrix:
-        tool: [web, email, filesystem]
+        tool: [k8s, web, email, filesystem]
     steps:
       - name: Checkout code
         uses: https://github.com/actions/checkout@v4
