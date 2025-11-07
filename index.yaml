@@ -1,0 +1,54 @@
+---
+version: '1.0'
+generated: '2025-11-07T01:44:10Z'
+tools:
+  email:
+    name: email
+    displayName: Email Tool
+    description: Send and receive emails via SMTP/IMAP
+    image: git.theryans.io/language-operator/email-tool:latest
+    deploymentMode: service
+    port: 8080
+    type: mcp
+    authRequired: true
+    egress:
+    - description: Allow SMTP/IMAP connections
+      dns:
+      - "*"
+      ports:
+      - port: 587
+        protocol: TCP
+      - port: 465
+        protocol: TCP
+      - port: 993
+        protocol: TCP
+  web:
+    name: web
+    displayName: Web Tool
+    description: Search the web and fetch web pages using DuckDuckGo
+    image: git.theryans.io/language-operator/web-tool:latest
+    deploymentMode: service
+    port: 8080
+    type: mcp
+    egress:
+    - description: Allow HTTPS to DuckDuckGo
+      dns:
+      - "*.duckduckgo.com"
+      - duckduckgo.com
+      ports:
+      - port: 443
+        protocol: TCP
+    - description: Allow HTTPS to any web destination
+      dns:
+      - "*"
+      ports:
+      - port: 443
+        protocol: TCP
+      - port: 80
+        protocol: TCP
+  web-search:
+    alias: web
+  web-fetch:
+    alias: web
+  http:
+    alias: web
