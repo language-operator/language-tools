@@ -11,11 +11,14 @@ RSpec.describe 'Tool Loading Integration' do
   end
 
   describe 'tool registration' do
-    it 'loads all 4 web tools' do
+    it 'loads all 7 web tools' do
       expect(registry.get('web_search')).not_to be_nil
       expect(registry.get('web_fetch')).not_to be_nil
       expect(registry.get('web_headers')).not_to be_nil
       expect(registry.get('web_status')).not_to be_nil
+      expect(registry.get('web_request')).not_to be_nil
+      expect(registry.get('web_post')).not_to be_nil
+      expect(registry.get('web_parse')).not_to be_nil
     end
 
     it 'tools have correct metadata' do
@@ -34,6 +37,18 @@ RSpec.describe 'Tool Loading Integration' do
       status_tool = registry.get('web_status')
       expect(status_tool.name).to eq('web_status')
       expect(status_tool.description).to include('HTTP status')
+
+      request_tool = registry.get('web_request')
+      expect(request_tool.name).to eq('web_request')
+      expect(request_tool.description).to include('HTTP requests')
+
+      post_tool = registry.get('web_post')
+      expect(post_tool.name).to eq('web_post')
+      expect(post_tool.description).to include('POST request')
+
+      parse_tool = registry.get('web_parse')
+      expect(parse_tool.name).to eq('web_parse')
+      expect(parse_tool.description).to include('Parse and extract')
     end
   end
 
