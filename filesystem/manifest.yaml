@@ -1,0 +1,20 @@
+name: filesystem
+displayName: Filesystem Tool
+description: Persistent file I/O for agent workspace - read, write, and manage files
+image: git.theryans.io/language-operator/filesystem-tool:latest
+deploymentMode: service
+port: 80
+type: mcp
+
+# Volume configuration for persistent workspace
+volumes:
+  - name: workspace
+    mountPath: /workspace
+    persistentVolumeClaim:
+      claimName: agent-workspace
+      readWriteMany: true
+
+# Optional aliases for this tool
+aliases:
+  - workspace
+  - files

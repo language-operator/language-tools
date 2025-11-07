@@ -103,6 +103,20 @@ tools:
         protocol: TCP
       - port: 80
         protocol: TCP
+  filesystem:
+    name: filesystem
+    displayName: Filesystem Tool
+    description: Persistent file I/O for agent workspace - read, write, and manage files
+    image: git.theryans.io/language-operator/filesystem-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    volumes:
+    - name: workspace
+      mountPath: /workspace
+      persistentVolumeClaim:
+        claimName: agent-workspace
+        readWriteMany: true
   web-search:
     alias: web
   web-fetch:
@@ -113,3 +127,7 @@ tools:
     alias: k8s
   kubernetes:
     alias: k8s
+  workspace:
+    alias: filesystem
+  files:
+    alias: filesystem
