@@ -1,14 +1,14 @@
-# Filesystem Tool Makefile
+# Workspace Tool Makefile
 # This Makefile uses the shared tools.mk for common targets
 
 # Image configuration
-IMAGE_NAME := git.theryans.io/language-operator/filesystem-tool
-TOOL_NAME := filesystem
+IMAGE_NAME := git.theryans.io/language-operator/workspace-tool
+TOOL_NAME := workspace
 
 # Include shared targets
 include ../tools.mk
 
-# Filesystem-specific test target
+# Workspace-specific test target
 .PHONY: test
 test:
 	@echo "Testing health endpoint..."
