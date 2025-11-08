@@ -59,8 +59,8 @@ RSpec.describe 'test_smtp tool' do
 
     result = tool.call({})
 
-    expect(result).to include('Error: Missing SMTP configuration')
-    expect(result).to include('SMTP_HOST')
+    expect(result).to include('Error: Missing configuration')
+    expect(result).to include('HOST')
   end
 
   it 'reports missing SMTP_USER configuration' do
@@ -68,8 +68,8 @@ RSpec.describe 'test_smtp tool' do
 
     result = tool.call({})
 
-    expect(result).to include('Error: Missing SMTP configuration')
-    expect(result).to include('SMTP_USER')
+    expect(result).to include('Error: Missing configuration')
+    expect(result).to include('USER')
   end
 
   it 'reports missing SMTP_PASSWORD configuration' do
@@ -77,8 +77,8 @@ RSpec.describe 'test_smtp tool' do
 
     result = tool.call({})
 
-    expect(result).to include('Error: Missing SMTP configuration')
-    expect(result).to include('SMTP_PASSWORD')
+    expect(result).to include('Error: Missing configuration')
+    expect(result).to include('PASSWORD')
   end
 
   it 'reports all missing configuration items' do
@@ -88,10 +88,10 @@ RSpec.describe 'test_smtp tool' do
 
     result = tool.call({})
 
-    expect(result).to include('Error: Missing SMTP configuration')
-    expect(result).to include('SMTP_HOST')
-    expect(result).to include('SMTP_USER')
-    expect(result).to include('SMTP_PASSWORD')
+    expect(result).to include('Error: Missing configuration')
+    expect(result).to include('HOST')
+    expect(result).to include('USER')
+    expect(result).to include('PASSWORD')
   end
 
   it 'uses default port 587 when SMTP_PORT not set' do

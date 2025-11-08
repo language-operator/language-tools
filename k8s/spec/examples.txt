@@ -1,9 +1,9 @@
 example_id                                     | status | run_time        |
 ---------------------------------------------- | ------ | --------------- |
-./spec/integration/tool_loading_spec.rb[1:1:1] | passed | 0.00146 seconds |
-./spec/integration/tool_loading_spec.rb[1:1:2] | passed | 0.0045 seconds  |
-./spec/integration/tool_loading_spec.rb[1:2:1] | passed | 0.00901 seconds |
-./spec/integration/tool_loading_spec.rb[1:2:2] | passed | 0.0016 seconds  |
-./spec/integration/tool_loading_spec.rb[1:2:3] | passed | 0.00104 seconds |
-./spec/integration/tool_loading_spec.rb[1:2:4] | passed | 0.00112 seconds |
-./spec/integration/tool_loading_spec.rb[1:2:5] | passed | 0.00129 seconds |
+./spec/integration/tool_loading_spec.rb[1:1:1] | passed | 0.00128 seconds |
+./spec/integration/tool_loading_spec.rb[1:1:2] | passed | 0.00197 seconds |
+./spec/integration/tool_loading_spec.rb[1:2:1] | passed | 0.00162 seconds |
+./spec/integration/tool_loading_spec.rb[1:2:2] | passed | 0.01184 seconds |
+./spec/integration/tool_loading_spec.rb[1:2:3] | passed | 0.00114 seconds |
+./spec/integration/tool_loading_spec.rb[1:2:4] | passed | 0.00103 seconds |
+./spec/integration/tool_loading_spec.rb[1:2:5] | passed | 0.00101 seconds |

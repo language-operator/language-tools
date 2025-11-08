@@ -359,14 +359,14 @@ tool "web_request" do
           last_error = response[:error]
           should_retry = (attempt < max_retries)
         # Retryable HTTP status code
-        elsif RetryHelpers.retryable_status?(response[:status])
+        elsif LanguageOperator::Retry.retryable_http_code?(response[:status])
           should_retry = (attempt < max_retries)
         end
       end
 
       if should_retry
         attempt += 1
-        delay = RetryHelpers.calculate_backoff(attempt)
+        delay = LanguageOperator::Retry.calculate_backoff(attempt)
         sleep delay
         next
       end

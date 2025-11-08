@@ -142,7 +142,7 @@ RSpec.describe 'send_email tool' do
       'body' => 'Content'
     })
 
-    expect(result).to include('Error: SMTP configuration missing')
+    expect(result).to include('Error: Missing configuration: HOST')
   end
 
   it 'returns error when SMTP_USER is missing' do
@@ -154,7 +154,7 @@ RSpec.describe 'send_email tool' do
       'body' => 'Content'
     })
 
-    expect(result).to include('Error: SMTP configuration missing')
+    expect(result).to include('Error: Missing configuration: USER')
   end
 
   it 'returns error when SMTP_PASSWORD is missing' do
@@ -166,7 +166,7 @@ RSpec.describe 'send_email tool' do
       'body' => 'Content'
     })
 
-    expect(result).to include('Error: SMTP configuration missing')
+    expect(result).to include('Error: Missing configuration: PASSWORD')
   end
 
   it 'returns error when from address cannot be determined' do
@@ -179,7 +179,7 @@ RSpec.describe 'send_email tool' do
       'body' => 'Content'
     })
 
-    expect(result).to include('Error: No sender address specified')
+    expect(result).to include('Error: Missing configuration: USER')
   end
 
   it 'handles SMTP connection errors gracefully' do
