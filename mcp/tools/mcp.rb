@@ -10,24 +10,10 @@ module MCPHelpers
   # Default timeout for MCP requests
   DEFAULT_TIMEOUT = 30
 
-  # Get Kubernetes client for CRD discovery
-  # @return [K8s::Client] Kubernetes client instance
-  def self.k8s_client
-    @k8s_client ||= begin
-      if File.exist?('/var/run/secrets/kubernetes.io/serviceaccount/token')
-        K8s::Client.in_cluster_config
-      else
-        K8s::Client.config(K8s::Config.load_file(File.expand_path('~/.kube/config')))
-      end
-    rescue StandardError => e
-      raise "Failed to initialize Kubernetes client: #{e.message}"
-    end
-  end
-
   # Discover MCP servers from LanguageTool CRDs
   # @return [Array<Hash>] List of MCP servers with name, namespace, endpoint
   def self.discover_servers
-    client = k8s_client
+    client = LanguageOperator::Kubernetes::Client.instance
 
     # Get all LanguageTool resources across all namespaces
     api = client.api('langop.io/v1alpha1')
@@ -283,7 +269,7 @@ tool "mcp_discover" do
       servers = MCPHelpers.discover_servers
       MCPHelpers.format_server_list(servers)
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions for LanguageTool CRDs"
+      LanguageOperator::Errors.access_denied("check RBAC permissions for LanguageTool CRDs")
     rescue StandardError => e
       "Error: #{e.message}"
     end

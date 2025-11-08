@@ -35,14 +35,6 @@ module WebHelpers
     504 => "Gateway Timeout"
   }.freeze
 
-  # Validate HTTP/HTTPS URL
-  # @param url [String] URL to validate
-  # @return [String, nil] Error message if invalid, nil if valid
-  def self.validate_http_url(url)
-    return nil if url =~ /^https?:\/\//
-    "Error: Invalid URL. Must start with http:// or https://"
-  end
-
   # Strip HTML tags and normalize whitespace
   # @param content [String] HTML content
   # @return [String] Plain text content
@@ -85,52 +77,6 @@ module WebHelpers
   end
 end
 
-# Retry logic helpers for API requests
-module RetryHelpers
-  # Default retry configuration
-  MAX_RETRIES = 3
-  BASE_DELAY = 1.0
-  MAX_DELAY = 10.0
-  JITTER_FACTOR = 0.1
-
-  # Retryable HTTP status codes (transient errors)
-  RETRYABLE_STATUS_CODES = [429, 500, 502, 503, 504].freeze
-
-  # Execute block with retry logic
-  # @param max_retries [Integer] Maximum retry attempts
-  # @return [Object] Block return value
-  def self.with_retry(max_retries = MAX_RETRIES)
-    retries = 0
-    begin
-      yield
-    rescue StandardError => e
-      if retries < max_retries
-        retries += 1
-        delay = calculate_backoff(retries)
-        sleep delay
-        retry
-      end
-      raise e
-    end
-  end
-
-  # Calculate exponential backoff with jitter
-  # @param attempt [Integer] Retry attempt number (1-based)
-  # @return [Float] Delay in seconds
-  def self.calculate_backoff(attempt)
-    exponential = BASE_DELAY * (2**(attempt - 1))
-    capped = [exponential, MAX_DELAY].min
-    jitter = capped * JITTER_FACTOR * (rand - 0.5)
-    capped + jitter
-  end
-
-  # Check if status code is retryable
-  # @param status [Integer] HTTP status code
-  # @return [Boolean] True if should retry
-  def self.retryable_status?(status)
-    RETRYABLE_STATUS_CODES.include?(status)
-  end
-end
 
 tool "web_search" do
   description "Search the web using DuckDuckGo and return results"
@@ -210,7 +156,7 @@ tool "web_fetch" do
     return_html = params["html"] || false
 
     # Validate URL
-    error = WebHelpers.validate_http_url(url)
+    error = LanguageOperator::Validators.http_url(url)
     next error if error
 
     # Fetch the URL using SDK HTTP client
@@ -251,7 +197,7 @@ tool "web_headers" do
     url = params["url"]
 
     # Validate URL
-    error = WebHelpers.validate_http_url(url)
+    error = LanguageOperator::Validators.http_url(url)
     next error if error
 
     # Fetch headers using SDK HTTP client
@@ -279,7 +225,7 @@ tool "web_status" do
     url = params["url"]
 
     # Validate URL
-    error = WebHelpers.validate_http_url(url)
+    error = LanguageOperator::Validators.http_url(url)
     next error if error
 
     # Get status code using SDK HTTP client (don't follow redirects to get actual status)
@@ -355,13 +301,13 @@ tool "web_request" do
     follow_redirects = params.key?("follow_redirects") ? params["follow_redirects"] : true
 
     # Validate URL
-    error = WebHelpers.validate_http_url(url)
+    error = LanguageOperator::Validators.http_url(url)
     next error if error
 
     # Validate method
     valid_methods = %w[GET POST PUT DELETE HEAD]
     unless valid_methods.include?(method)
-      next "Error: Invalid HTTP method '#{method}'. Must be one of: #{valid_methods.join(', ')}"
+      next LanguageOperator::Validators.one_of(method, valid_methods, 'HTTP method')
     end
 
     # Parse headers
@@ -369,7 +315,7 @@ tool "web_request" do
     if params["headers"]
       parsed = WebHelpers.parse_json(params["headers"])
       if parsed.nil?
-        next "Error: Invalid JSON in headers parameter"
+        next LanguageOperator::Errors.invalid_json('headers')
       end
       headers = parsed
     end
@@ -378,7 +324,7 @@ tool "web_request" do
     if params["query_params"]
       parsed = WebHelpers.parse_json(params["query_params"])
       if parsed.nil?
-        next "Error: Invalid JSON in query_params parameter"
+        next LanguageOperator::Errors.invalid_json('query_params')
       end
       url += WebHelpers.build_query_string(parsed)
     end
@@ -505,13 +451,13 @@ tool "web_post" do
     timeout = params["timeout"] || 30
 
     # Validate URL
-    error = WebHelpers.validate_http_url(url)
+    error = LanguageOperator::Validators.http_url(url)
     next error if error
 
     # Parse and validate data JSON
     parsed_data = WebHelpers.parse_json(data)
     if parsed_data.nil?
-      next "Error: Invalid JSON in data parameter"
+      next LanguageOperator::Errors.invalid_json('data')
     end
 
     # Build headers with JSON content type
@@ -520,7 +466,7 @@ tool "web_post" do
     if params["headers"]
       custom_headers = WebHelpers.parse_json(params["headers"])
       if custom_headers.nil?
-        next "Error: Invalid JSON in headers parameter"
+        next LanguageOperator::Errors.invalid_json('headers')
       end
       headers.merge!(custom_headers)
     end
@@ -582,7 +528,7 @@ tool "web_parse" do
     json_path = params["json_path"]
 
     # Validate URL
-    error = WebHelpers.validate_http_url(url)
+    error = LanguageOperator::Validators.http_url(url)
     next error if error
 
     # Fetch the URL

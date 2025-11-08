@@ -5,20 +5,6 @@ require 'mail'
 
 # Helper methods for email tools
 module EmailHelpers
-  # Load SMTP configuration from environment variables
-  # @param overrides [Hash] Optional overrides (e.g., {from: 'custom@example.com'})
-  # @return [Hash] SMTP configuration hash
-  def self.load_smtp_config(overrides = {})
-    {
-      host: ENV['SMTP_HOST'],
-      port: ENV.fetch('SMTP_PORT', '587').to_i,
-      user: ENV['SMTP_USER'],
-      password: ENV['SMTP_PASSWORD'],
-      from: overrides[:from] || ENV['SMTP_FROM'] || ENV['SMTP_USER'],
-      tls: ENV.fetch('SMTP_TLS', 'true') == 'true'
-    }
-  end
-
   # Parse comma-separated email addresses
   # @param addresses_str [String, nil] Comma-separated email addresses
   # @return [Array<String>] Array of trimmed email addresses
@@ -73,17 +59,25 @@ tool "send_email" do
   end
 
   execute do |params|
-    # Get SMTP configuration from environment
-    config = EmailHelpers.load_smtp_config(from: params['from'])
+    # Get SMTP configuration from environment using SDK
+    begin
+      config = LanguageOperator::Config.load(
+        { host: 'HOST', port: 'PORT', user: 'USER', password: 'PASSWORD', from: 'FROM', tls: 'TLS' },
+        prefix: 'SMTP',
+        required: [:host, :user, :password],
+        defaults: { port: '587', tls: 'true', from: ENV['SMTP_USER'] },
+        types: { port: :integer, tls: :boolean }
+      )
 
-    # Validate from address first (more specific error)
-    unless config[:from]
-      next "Error: No sender address specified. Set SMTP_FROM or provide 'from' parameter."
-    end
+      # Override from if provided in params
+      config[:from] = params['from'] if params['from']
 
-    # Validate general SMTP configuration
-    unless config[:host] && config[:user] && config[:password]
-      next "Error: SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD environment variables."
+      # Validate from address
+      unless config[:from]
+        next LanguageOperator::Errors.missing_config("sender address (SMTP_FROM or 'from' parameter)")
+      end
+    rescue RuntimeError => e
+      next e.message
     end
 
     # Parse recipients
@@ -134,16 +128,17 @@ tool "test_smtp" do
   description "Test SMTP connection and configuration"
 
   execute do |params|
-    config = EmailHelpers.load_smtp_config
-
-    # Check configuration
-    missing = []
-    missing << 'SMTP_HOST' unless config[:host]
-    missing << 'SMTP_USER' unless config[:user]
-    missing << 'SMTP_PASSWORD' unless config[:password]
-
-    unless missing.empty?
-      next "Error: Missing SMTP configuration: #{missing.join(', ')}"
+    # Load SMTP configuration using SDK
+    begin
+      config = LanguageOperator::Config.load(
+        { host: 'HOST', port: 'PORT', user: 'USER', password: 'PASSWORD', from: 'FROM', tls: 'TLS' },
+        prefix: 'SMTP',
+        required: [:host, :user, :password],
+        defaults: { port: '587', tls: 'true', from: ENV['SMTP_USER'] },
+        types: { port: :integer, tls: :boolean }
+      )
+    rescue RuntimeError => e
+      next e.message
     end
 
     # Test connection
@@ -181,7 +176,13 @@ tool "email_config" do
   description "Display current email configuration (without sensitive data)"
 
   execute do |params|
-    config = EmailHelpers.load_smtp_config
+    # Load SMTP configuration using SDK (no validation required for display)
+    config = LanguageOperator::Config.from_env(
+      { host: 'HOST', port: 'PORT', user: 'USER', password: 'PASSWORD', from: 'FROM', tls: 'TLS' },
+      prefix: 'SMTP',
+      defaults: { port: '587', tls: 'true', from: ENV['SMTP_USER'] },
+      types: { port: :integer, tls: :boolean }
+    )
 
     password_set = config[:password] ? 'Yes (hidden)' : 'No'
 

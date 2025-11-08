@@ -6,21 +6,6 @@ require 'json'
 
 # Helper methods for k8s tools
 module K8sHelpers
-  # Get Kubernetes client
-  # @return [K8s::Client] Kubernetes client instance
-  def self.client
-    @client ||= begin
-      # Try in-cluster config first, fall back to kubeconfig
-      if File.exist?('/var/run/secrets/kubernetes.io/serviceaccount/token')
-        K8s::Client.in_cluster_config
-      else
-        K8s::Client.config(K8s::Config.load_file(File.expand_path('~/.kube/config')))
-      end
-    rescue StandardError => e
-      raise "Failed to initialize Kubernetes client: #{e.message}"
-    end
-  end
-
   # Parse resource reference (kind/name or kind.group/name)
   # @param resource [String] Resource reference
   # @return [Hash] Parsed resource info
@@ -121,7 +106,7 @@ tool "k8s_get" do
 
   execute do |params|
     begin
-      client = K8sHelpers.client
+      client = LanguageOperator::Kubernetes::Client.instance
       namespace = K8sHelpers.validate_namespace(params['namespace'])
 
       # Get the API resource
@@ -139,9 +124,9 @@ tool "k8s_get" do
         K8sHelpers.format_resource(resource)
       end
     rescue K8s::Error::NotFound
-      "Error: Resource not found - #{params['resource']}/#{params['name']}"
+      LanguageOperator::Errors.not_found("#{params['resource']}/#{params['name']}", "")
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions"
+      LanguageOperator::Errors.access_denied
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -179,7 +164,7 @@ tool "k8s_list" do
 
   execute do |params|
     begin
-      client = K8sHelpers.client
+      client = LanguageOperator::Kubernetes::Client.instance
       namespace = K8sHelpers.validate_namespace(params['namespace'])
 
       # Build options
@@ -206,7 +191,7 @@ tool "k8s_list" do
 
       "#{header}:\n\n#{K8sHelpers.format_list(resources)}"
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions"
+      LanguageOperator::Errors.access_denied
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -231,7 +216,7 @@ tool "k8s_apply" do
 
   execute do |params|
     begin
-      client = K8sHelpers.client
+      client = LanguageOperator::Kubernetes::Client.instance
 
       # Parse YAML
       resource_hash = YAML.safe_load(params['yaml'], permitted_classes: [Symbol, Date, Time])
@@ -272,7 +257,7 @@ tool "k8s_apply" do
         "Successfully created #{resource.kind}/#{resource.metadata.name}"
       end
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions"
+      LanguageOperator::Errors.access_denied
     rescue Psych::SyntaxError => e
       "Error: Invalid YAML - #{e.message}"
     rescue StandardError => e
@@ -305,7 +290,7 @@ tool "k8s_delete" do
 
   execute do |params|
     begin
-      client = K8sHelpers.client
+      client = LanguageOperator::Kubernetes::Client.instance
       namespace = K8sHelpers.validate_namespace(params['namespace'])
 
       # Get the API resource
@@ -319,9 +304,9 @@ tool "k8s_delete" do
 
       "Successfully deleted #{params['resource']}/#{params['name']}"
     rescue K8s::Error::NotFound
-      "Error: Resource not found - #{params['resource']}/#{params['name']}"
+      LanguageOperator::Errors.not_found("#{params['resource']}/#{params['name']}", "")
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions"
+      LanguageOperator::Errors.access_denied
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -366,7 +351,7 @@ tool "k8s_logs" do
 
   execute do |params|
     begin
-      client = K8sHelpers.client
+      client = LanguageOperator::Kubernetes::Client.instance
       namespace = K8sHelpers.validate_namespace(params['namespace']) || 'default'
 
       # Build log options
@@ -384,7 +369,7 @@ tool "k8s_logs" do
 
       "#{header}:\n\n#{logs}"
     rescue K8s::Error::NotFound
-      "Error: Pod not found - #{params['name']}"
+      LanguageOperator::Errors.not_found('Pod', params['name'])
     rescue K8s::Error::BadRequest => e
       if e.message.include?('container')
         # Get pod to list containers
@@ -400,7 +385,7 @@ tool "k8s_logs" do
         "Error: #{e.message}"
       end
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions"
+      LanguageOperator::Errors.access_denied
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -437,7 +422,7 @@ tool "k8s_exec" do
 
   execute do |params|
     begin
-      client = K8sHelpers.client
+      client = LanguageOperator::Kubernetes::Client.instance
       namespace = K8sHelpers.validate_namespace(params['namespace']) || 'default'
 
       # Split command into array
@@ -459,7 +444,7 @@ tool "k8s_exec" do
 
       "#{header}:\n\n#{result}"
     rescue K8s::Error::NotFound
-      "Error: Pod not found - #{params['name']}"
+      LanguageOperator::Errors.not_found('Pod', params['name'])
     rescue K8s::Error::BadRequest => e
       if e.message.include?('container')
         # Get pod to list containers
@@ -475,7 +460,7 @@ tool "k8s_exec" do
         "Error: #{e.message}"
       end
     rescue K8s::Error::Forbidden
-      "Error: Access denied - check RBAC permissions"
+      LanguageOperator::Errors.access_denied
     rescue StandardError => e
       "Error: #{e.message}"
     end

@@ -138,14 +138,6 @@ module CronHelpers
     end
   end
 
-  # Get Kubernetes client
-  def self.k8s_client
-    config = K8s::Config.load_file(ENV['KUBECONFIG'] || File.expand_path('~/.kube/config'))
-    K8s::Client.new(config)
-  rescue StandardError
-    # Fallback to in-cluster config
-    K8s::Client.in_cluster_config
-  end
 end
 
 # Parse natural language or cron expression to cron format
@@ -210,7 +202,7 @@ tool "create_schedule" do
     next cron_expr if cron_expr.start_with?('Error:')
 
     begin
-      client = CronHelpers.k8s_client
+      client = LanguageOperator::Kubernetes::Client.instance
       agent_api = client.api('langop.io/v1alpha1')
 
       # Get current agent
@@ -234,7 +226,7 @@ tool "create_schedule" do
 
       "Schedule created successfully:\nAgent: #{params['agent_name']}\nCron: #{cron_expr}\nTask: #{params['task']}\nNext run: #{CronHelpers.get_next_times(cron_expr, 1).first}"
     rescue K8s::Error::NotFound
-      "Error: LanguageAgent '#{params['agent_name']}' not found in namespace '#{params['namespace']}'"
+      LanguageOperator::Errors.not_found("LanguageAgent '#{params['agent_name']}'", "namespace '#{params['namespace']}'")
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -294,7 +286,7 @@ tool "update_schedule" do
     end
 
     begin
-      client = CronHelpers.k8s_client
+      client = LanguageOperator::Kubernetes::Client.instance
       agent_api = client.api('langop.io/v1alpha1')
 
       agent = agent_api.resource('languageagents', namespace: params['namespace']).get(params['agent_name'])
@@ -319,7 +311,7 @@ tool "update_schedule" do
       updated = agent.spec['schedules'][index]
       "Schedule updated successfully:\nAgent: #{params['agent_name']}\nCron: #{updated['cron']}\nTask: #{updated['task']}\nNext run: #{CronHelpers.get_next_times(updated['cron'], 1).first}"
     rescue K8s::Error::NotFound
-      "Error: LanguageAgent '#{params['agent_name']}' not found in namespace '#{params['namespace']}'"
+      LanguageOperator::Errors.not_found("LanguageAgent '#{params['agent_name']}'", "namespace '#{params['namespace']}'")
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -359,7 +351,7 @@ tool "delete_schedule" do
     next "Error: Must specify either schedule_index or schedule_name" unless params['schedule_index'] || params['schedule_name']
 
     begin
-      client = CronHelpers.k8s_client
+      client = LanguageOperator::Kubernetes::Client.instance
       agent_api = client.api('langop.io/v1alpha1')
 
       agent = agent_api.resource('languageagents', namespace: params['namespace']).get(params['agent_name'])
@@ -381,7 +373,7 @@ tool "delete_schedule" do
 
       "Schedule deleted successfully:\nAgent: #{params['agent_name']}\nDeleted schedule: #{deleted['cron']} - #{deleted['task']}"
     rescue K8s::Error::NotFound
-      "Error: LanguageAgent '#{params['agent_name']}' not found in namespace '#{params['namespace']}'"
+      LanguageOperator::Errors.not_found("LanguageAgent '#{params['agent_name']}'", "namespace '#{params['namespace']}'")
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -407,7 +399,7 @@ tool "list_schedules" do
 
   execute do |params|
     begin
-      client = CronHelpers.k8s_client
+      client = LanguageOperator::Kubernetes::Client.instance
       agent_api = client.api('langop.io/v1alpha1')
 
       agent = agent_api.resource('languageagents', namespace: params['namespace']).get(params['agent_name'])
@@ -429,7 +421,7 @@ tool "list_schedules" do
 
       result
     rescue K8s::Error::NotFound
-      "Error: LanguageAgent '#{params['agent_name']}' not found in namespace '#{params['namespace']}'"
+      LanguageOperator::Errors.not_found("LanguageAgent '#{params['agent_name']}'", "namespace '#{params['namespace']}'")
     rescue StandardError => e
       "Error: #{e.message}"
     end
@@ -515,7 +507,7 @@ tool "schedule_once" do
     cron_expr = execute_at.strftime('%M %H %d %m *')
 
     begin
-      client = CronHelpers.k8s_client
+      client = LanguageOperator::Kubernetes::Client.instance
       agent_api = client.api('langop.io/v1alpha1')
 
       agent = agent_api.resource('languageagents', namespace: params['namespace']).get(params['agent_name'])
@@ -535,7 +527,7 @@ tool "schedule_once" do
 
       "One-time schedule created successfully:\nAgent: #{params['agent_name']}\nExecute at: #{execute_at.utc.strftime('%Y-%m-%d %H:%M:%S UTC')}\nTask: #{params['task']}"
     rescue K8s::Error::NotFound
-      "Error: LanguageAgent '#{params['agent_name']}' not found in namespace '#{params['namespace']}'"
+      LanguageOperator::Errors.not_found("LanguageAgent '#{params['agent_name']}'", "namespace '#{params['namespace']}'")
     rescue StandardError => e
       "Error: #{e.message}"
     end

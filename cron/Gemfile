@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 source 'https://git.theryans.io/api/packages/language-operator/rubygems' do
-  gem 'language-operator', '~> 0.1.7'
+  gem 'language-operator', '~> 0.1.15'
 end
 
 gem 'rufus-scheduler', '~> 3.9'

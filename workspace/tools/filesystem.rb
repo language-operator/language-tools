@@ -16,7 +16,7 @@ module FilesystemHelpers
     path = path.to_s.strip
 
     # Reject empty paths
-    return "Error: Path cannot be empty" if path.empty?
+    return LanguageOperator::Errors.empty_field("Path") if path.empty?
 
     # Build absolute path
     absolute_path = if path.start_with?('/')
