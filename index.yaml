@@ -1,64 +1,7 @@
 ---
 version: '1.0'
-generated: '2025-11-07T22:10:00Z'
+generated: '2025-11-08T00:02:21Z'
 tools:
-  k8s:
-    name: k8s
-    displayName: Kubernetes Tool
-    description: Native Kubernetes operations - manage resources, pods, logs, and CRDs
-    image: git.theryans.io/language-operator/k8s-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    rbac:
-      clusterRole:
-        rules:
-        - apiGroups:
-          - "*"
-          resources:
-          - "*"
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - ""
-          resources:
-          - pods
-          - services
-          - configmaps
-          - secrets
-          verbs:
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - apps
-          resources:
-          - deployments
-          - statefulsets
-          - daemonsets
-          verbs:
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - ""
-          resources:
-          - pods/log
-          - pods/exec
-          verbs:
-          - get
-          - create
-    egress:
-    - description: Allow access to Kubernetes API server
-      dns:
-      - kubernetes.default.svc.cluster.local
-      ports:
-      - port: 443
-        protocol: TCP
   email:
     name: email
     displayName: Email Tool
@@ -103,31 +46,137 @@ tools:
         protocol: TCP
       - port: 80
         protocol: TCP
-  filesystem:
-    name: filesystem
-    displayName: Filesystem Tool
-    description: Persistent file I/O for agent workspace - read, write, and manage files
-    image: git.theryans.io/language-operator/filesystem-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    volumes:
-    - name: workspace
-      mountPath: /workspace
-      persistentVolumeClaim:
-        claimName: agent-workspace
-        readWriteMany: true
   web-search:
     alias: web
   web-fetch:
     alias: web
   http:
     alias: web
+  k8s:
+    name: k8s
+    displayName: Kubernetes Tool
+    description: Native Kubernetes operations - manage resources, pods, logs, and
+      CRDs
+    image: git.theryans.io/language-operator/k8s-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    rbac:
+      clusterRole:
+        rules:
+        - apiGroups:
+          - "*"
+          resources:
+          - "*"
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ''
+          resources:
+          - pods
+          - services
+          - configmaps
+          - secrets
+          verbs:
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          - daemonsets
+          verbs:
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ''
+          resources:
+          - pods/log
+          - pods/exec
+          verbs:
+          - get
+          - create
+    egress:
+    - description: Allow access to Kubernetes API server
+      dns:
+      - kubernetes.default.svc.cluster.local
+      ports:
+      - port: 443
+        protocol: TCP
   kubectl:
     alias: k8s
   kubernetes:
     alias: k8s
+  filesystem:
+    name: filesystem
+    displayName: Filesystem Tool
+    description: Persistent file I/O for agent workspace - read, write, and manage
+      files
+    image: git.theryans.io/language-operator/filesystem-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    volumes:
+    - name: workspace
+      mountPath: "/workspace"
+      persistentVolumeClaim:
+        claimName: agent-workspace
+        readWriteMany: true
   workspace:
     alias: filesystem
   files:
     alias: filesystem
+  mcp:
+    name: mcp
+    displayName: MCP Bridge Tool
+    description: Universal bridge to external MCP servers - discover and call tools
+      from the MCP ecosystem
+    image: git.theryans.io/language-operator/mcp-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    rbac:
+      clusterRole:
+        rules:
+        - apiGroups:
+          - langop.io
+          resources:
+          - languagetools
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ''
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+    egress:
+    - description: Allow access to all MCP servers in cluster
+      cidr: 10.0.0.0/8
+      ports:
+      - port: 80
+        protocol: TCP
+      - port: 443
+        protocol: TCP
+    - description: Allow DNS resolution
+      dns:
+      - "*.svc.cluster.local"
+      ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+  mcp-client:
+    alias: mcp
+  mcp-bridge:
+    alias: mcp

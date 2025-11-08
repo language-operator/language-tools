@@ -1,0 +1,44 @@
+name: mcp
+displayName: MCP Bridge Tool
+description: Universal bridge to external MCP servers - discover and call tools from the MCP ecosystem
+image: git.theryans.io/language-operator/mcp-tool:latest
+deploymentMode: service
+port: 80
+type: mcp
+
+# RBAC configuration for LanguageTool CRD access
+rbac:
+  # ServiceAccount will be created automatically
+  clusterRole:
+    rules:
+      # Allow reading LanguageTool CRDs to discover MCP servers
+      - apiGroups: ["langop.io"]
+        resources: ["languagetools"]
+        verbs: ["get", "list", "watch"]
+      # Allow reading namespaces for cross-namespace discovery
+      - apiGroups: [""]
+        resources: ["namespaces"]
+        verbs: ["get", "list"]
+
+# Network egress configuration
+egress:
+  - description: Allow access to all MCP servers in cluster
+    cidr: "10.0.0.0/8"
+    ports:
+      - port: 80
+        protocol: TCP
+      - port: 443
+        protocol: TCP
+  - description: Allow DNS resolution
+    dns:
+      - "*.svc.cluster.local"
+    ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+
+# Optional aliases for this tool
+aliases:
+  - mcp-client
+  - mcp-bridge

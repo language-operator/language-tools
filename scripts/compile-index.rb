@@ -8,7 +8,7 @@ require 'pathname'
 # Usage: ruby scripts/compile-index.rb
 
 class ManifestCompiler
-  TOOL_DIRS = %w[email web].freeze
+  TOOL_DIRS = %w[email web k8s filesystem mcp].freeze
   OUTPUT_FILE = 'index.yaml'
 
   def initialize
