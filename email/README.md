@@ -1,268 +1,722 @@
-# email
+# Email Tool
 
-An MCP server that provides email sending capabilities via SMTP. Built on top of [based/svc/mcp](../mcp), this server allows AI assistants and other tools to send emails programmatically.
+**Send and receive emails via SMTP/IMAP**
 
-## Quick Start
+The Email Tool provides email capabilities for Language Operator agents, allowing them to send notifications, alerts, and reports via SMTP.
 
-Run the server with SMTP credentials:
+## Overview
 
-```bash
-docker run -p 8080:80 \
-  -e SMTP_HOST=smtp.gmail.com \
-  -e SMTP_PORT=587 \
-  -e SMTP_USER=your-email@gmail.com \
-  -e SMTP_PASSWORD=your-app-password \
-  -e SMTP_FROM=your-email@gmail.com \
-  based/svc/email:latest
+- **Type:** MCP Server
+- **Deployment Mode:** Service
+- **Port:** 80
+- **Protocols:** SMTP (sending)
+- **Authentication:** Required via environment variables
+- **Security:** TLS encryption enabled by default
+
+## Use Cases
+
+### Notifications & Alerts
+```yaml
+apiVersion: langop.io/v1alpha1
+kind: LanguageAgent
+metadata:
+  name: alert-manager
+spec:
+  instructions: |
+    Monitor system health and email alerts when issues are detected
+  tools:
+  - k8s
+  - email
 ```
 
-Send an email:
+**Perfect for:**
+- System health alerts
+- Error notifications
+- Deployment notifications
+- Threshold breach alerts
 
-```bash
-curl -X POST http://localhost:8080/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "send_email",
-    "arguments": {
-      "to": "recipient@example.com",
-      "subject": "Hello from MCP",
-      "body": "This is a test email sent via MCP!"
-    }
-  }'
+### Automated Reporting
+```yaml
+apiVersion: langop.io/v1alpha1
+kind: LanguageAgent
+metadata:
+  name: daily-reporter
+spec:
+  instructions: |
+    Generate and email daily summary reports at 9am
+  tools:
+  - workspace
+  - web
+  - email
 ```
 
-## Available Tools
+**Perfect for:**
+- Daily/weekly summaries
+- Performance reports
+- Usage statistics
+- Compliance reports
 
-### `send_email`
+### Workflow Notifications
+```yaml
+apiVersion: langop.io/v1alpha1
+kind: LanguageAgent
+metadata:
+  name: workflow-notifier
+spec:
+  instructions: |
+    Send status updates as tasks complete
+  tools:
+  - email
+  - workspace
+```
+
+**Perfect for:**
+- Task completion notifications
+- Approval requests
+- Status updates
+- Team coordination
+
+---
+
+## Tools
+
+The Email Tool exposes 3 MCP tools for email operations:
+
+### 1. send_email
+
 Send an email via SMTP.
 
 **Parameters:**
-- `to` (string, required) - Recipient email address (comma-separated for multiple)
+- `to` (string, required) - Recipient email address (comma-separated for multiple recipients)
 - `subject` (string, required) - Email subject line
-- `body` (string, required) - Email body content
-- `from` (string, optional) - Sender email address (defaults to SMTP_FROM)
+- `body` (string, required) - Email body content (plain text or HTML)
+- `from` (string, optional) - Sender email address (defaults to SMTP_FROM env variable)
 - `cc` (string, optional) - CC email addresses (comma-separated)
 - `bcc` (string, optional) - BCC email addresses (comma-separated)
 - `html` (boolean, optional) - Send as HTML email (default: false)
 
-**Example:**
-```bash
-# Simple email
-curl -X POST http://localhost:8080/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "send_email",
-    "arguments": {
-      "to": "user@example.com",
-      "subject": "Meeting Reminder",
-      "body": "Don'\''t forget our meeting at 3pm!"
-    }
-  }'
+**Returns:** Success message with recipient list
 
-# Email with CC and HTML
-curl -X POST http://localhost:8080/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "send_email",
-    "arguments": {
-      "to": "user@example.com",
-      "cc": "manager@example.com",
-      "subject": "Project Update",
-      "body": "<h1>Project Status</h1><p>All tasks completed!</p>",
-      "html": true
-    }
-  }'
+**Examples:**
+
+Simple email:
+```json
+{
+  "name": "send_email",
+  "arguments": {
+    "to": "user@example.com",
+    "subject": "Task Completed",
+    "body": "The deployment task completed successfully at 14:30."
+  }
+}
 ```
 
-### `test_smtp`
+Multiple recipients:
+```json
+{
+  "name": "send_email",
+  "arguments": {
+    "to": "alice@example.com, bob@example.com",
+    "subject": "Team Update",
+    "body": "Sprint planning meeting scheduled for Friday at 2pm."
+  }
+}
+```
+
+With CC and BCC:
+```json
+{
+  "name": "send_email",
+  "arguments": {
+    "to": "manager@example.com",
+    "cc": "team@example.com",
+    "bcc": "archive@example.com",
+    "subject": "Monthly Report",
+    "body": "Please find the monthly report attached..."
+  }
+}
+```
+
+HTML email:
+```json
+{
+  "name": "send_email",
+  "arguments": {
+    "to": "stakeholders@example.com",
+    "subject": "System Status Report",
+    "body": "<h1>System Status</h1><p><strong>All systems operational</strong></p><ul><li>API: ✓</li><li>Database: ✓</li><li>Cache: ✓</li></ul>",
+    "html": true
+  }
+}
+```
+
+Custom sender:
+```json
+{
+  "name": "send_email",
+  "arguments": {
+    "to": "recipient@example.com",
+    "from": "noreply@example.com",
+    "subject": "Automated Alert",
+    "body": "This is an automated message from the monitoring system."
+  }
+}
+```
+
+**Output Format:**
+```
+Email sent successfully to user@example.com
+```
+
+For multiple recipients:
+```
+Email sent successfully to alice@example.com, bob@example.com
+```
+
+**Error Handling:**
+- Missing sender → `Error: No sender address specified. Set SMTP_FROM or provide 'from' parameter.`
+- Missing SMTP config → `Error: SMTP configuration missing. Please set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD environment variables.`
+- Send failure → `Error sending email: <reason>`
+
+---
+
+### 2. test_smtp
+
 Test SMTP connection and configuration.
 
 **Parameters:** None
 
-**Example:**
-```bash
-curl -X POST http://localhost:8080/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{"name":"test_smtp","arguments":{}}'
+**Returns:** Configuration summary and connection test result
+
+**Examples:**
+
+Test connection:
+```json
+{
+  "name": "test_smtp",
+  "arguments": {}
+}
 ```
 
-### `email_config`
-Display current email configuration (without showing sensitive data).
+**Output Format (Success):**
+```
+SMTP Configuration Test: SUCCESS
+
+Host: smtp.gmail.com
+Port: 587
+User: notifications@example.com
+From: notifications@example.com
+TLS: true
+
+Connection to SMTP server successful!
+```
+
+**Output Format (Failure):**
+```
+SMTP Configuration Test: FAILED
+
+Host: smtp.gmail.com
+Port: 587
+User: notifications@example.com
+
+Error: Authentication failed - invalid credentials
+```
+
+**Error Handling:**
+- Missing configuration → `Error: Missing SMTP configuration: SMTP_HOST, SMTP_USER, SMTP_PASSWORD`
+- Connection failed → Shows error message with details
+
+---
+
+### 3. email_config
+
+Display current email configuration (without sensitive data).
 
 **Parameters:** None
 
-**Example:**
-```bash
-curl -X POST http://localhost:8080/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{"name":"email_config","arguments":{}}'
+**Returns:** Configuration summary with password masked
+
+**Examples:**
+
+View configuration:
+```json
+{
+  "name": "email_config",
+  "arguments": {}
+}
 ```
+
+**Output Format:**
+```
+Email Configuration:
+
+SMTP_HOST: smtp.gmail.com
+SMTP_PORT: 587
+SMTP_USER: notifications@example.com
+SMTP_FROM: notifications@example.com
+SMTP_TLS: true
+SMTP_PASSWORD: Yes (hidden)
+
+Note: Set these via environment variables when running the container.
+```
+
+---
 
 ## Configuration
 
-Email configuration is provided via environment variables:
+### Environment Variables
 
-| Environment Variable | Required | Default | Description |
-| -- | -- | -- | -- |
-| SMTP_HOST | Yes | - | SMTP server hostname (e.g., smtp.gmail.com) |
-| SMTP_PORT | No | 587 | SMTP port (usually 587 for TLS, 465 for SSL) |
-| SMTP_USER | Yes | - | SMTP username (often your email address) |
-| SMTP_PASSWORD | Yes | - | SMTP password or app-specific password |
-| SMTP_FROM | No | SMTP_USER | Default sender email address |
-| SMTP_TLS | No | true | Use TLS encryption |
+All SMTP configuration is provided via environment variables:
 
-## Common SMTP Providers
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SMTP_HOST` | Yes | - | SMTP server hostname (e.g., smtp.gmail.com) |
+| `SMTP_PORT` | No | 587 | SMTP port (587 for TLS, 465 for SSL) |
+| `SMTP_USER` | Yes | - | SMTP username (often your email address) |
+| `SMTP_PASSWORD` | Yes | - | SMTP password or app-specific password |
+| `SMTP_FROM` | No | SMTP_USER | Default sender email address |
+| `SMTP_TLS` | No | true | Use TLS encryption (recommended) |
 
-### Gmail
-```bash
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password  # Generate at https://myaccount.google.com/apppasswords
+### Common SMTP Providers
+
+#### Gmail
+```yaml
+env:
+- name: SMTP_HOST
+  value: smtp.gmail.com
+- name: SMTP_PORT
+  value: "587"
+- name: SMTP_USER
+  value: your-email@gmail.com
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: email-credentials
+      key: password
+- name: SMTP_TLS
+  value: "true"
 ```
 
-### Outlook/Office 365
-```bash
-SMTP_HOST=smtp.office365.com
-SMTP_PORT=587
-SMTP_USER=your-email@outlook.com
-SMTP_PASSWORD=your-password
+**Note:** Gmail requires an [app-specific password](https://myaccount.google.com/apppasswords) if 2FA is enabled.
+
+#### Outlook/Office 365
+```yaml
+env:
+- name: SMTP_HOST
+  value: smtp.office365.com
+- name: SMTP_PORT
+  value: "587"
+- name: SMTP_USER
+  value: your-email@outlook.com
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: email-credentials
+      key: password
 ```
 
-### SendGrid
-```bash
-SMTP_HOST=smtp.sendgrid.net
-SMTP_PORT=587
-SMTP_USER=apikey
-SMTP_PASSWORD=your-api-key
+#### SendGrid
+```yaml
+env:
+- name: SMTP_HOST
+  value: smtp.sendgrid.net
+- name: SMTP_PORT
+  value: "587"
+- name: SMTP_USER
+  value: apikey
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: sendgrid-credentials
+      key: api-key
 ```
 
-### Mailgun
-```bash
-SMTP_HOST=smtp.mailgun.org
-SMTP_PORT=587
-SMTP_USER=postmaster@your-domain.mailgun.org
-SMTP_PASSWORD=your-smtp-password
+#### Mailgun
+```yaml
+env:
+- name: SMTP_HOST
+  value: smtp.mailgun.org
+- name: SMTP_PORT
+  value: "587"
+- name: SMTP_USER
+  value: postmaster@your-domain.mailgun.org
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: mailgun-credentials
+      key: smtp-password
 ```
 
-## Development
+---
 
-Build the image:
+## Network Security
 
-```bash
-make build
+### Egress Control
+
+The Email Tool requires network egress to SMTP servers:
+
+```yaml
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: email
+spec:
+  image: git.theryans.io/language-operator/email-tool:latest
+  authRequired: true
+  egress:
+  - description: Allow SMTP/IMAP connections
+    dns:
+    - "*"
+    ports:
+    - port: 587
+      protocol: TCP
+    - port: 465
+      protocol: TCP
+    - port: 993
+      protocol: TCP
 ```
 
-Run the server with test credentials:
+### Restricted Access
 
-```bash
-SMTP_HOST=smtp.gmail.com \
-SMTP_USER=test@gmail.com \
-SMTP_PASSWORD=app-password \
-make run
+Limit to specific SMTP server:
+
+```yaml
+egress:
+- description: Allow Gmail SMTP
+  dns:
+  - "smtp.gmail.com"
+  ports:
+  - port: 587
+    protocol: TCP
 ```
 
-Run unit tests:
+---
 
-```bash
-make spec
+## Deployment
+
+### As a LanguageTool
+
+```yaml
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: email
+spec:
+  image: git.theryans.io/language-operator/email-tool:latest
+  deploymentMode: service
+  port: 80
+  type: mcp
+  authRequired: true
+  env:
+  - name: SMTP_HOST
+    value: smtp.gmail.com
+  - name: SMTP_PORT
+    value: "587"
+  - name: SMTP_USER
+    valueFrom:
+      secretKeyRef:
+        name: email-smtp
+        key: username
+  - name: SMTP_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: email-smtp
+        key: password
+  - name: SMTP_FROM
+    value: notifications@example.com
+  - name: SMTP_TLS
+    value: "true"
+  egress:
+  - description: Allow SMTP
+    dns:
+    - "smtp.gmail.com"
+    ports:
+    - port: 587
+      protocol: TCP
 ```
 
-Test all endpoints (integration):
+### Create SMTP Secret
 
 ```bash
-make test
+kubectl create secret generic email-smtp \
+  --from-literal=username=your-email@gmail.com \
+  --from-literal=password=your-app-password
 ```
 
-Run linter:
+Or via YAML:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: email-smtp
+type: Opaque
+stringData:
+  username: your-email@gmail.com
+  password: your-app-password
+```
+
+### Agent Configuration
+
+```yaml
+apiVersion: langop.io/v1alpha1
+kind: LanguageAgent
+metadata:
+  name: alert-notifier
+spec:
+  instructions: |
+    Monitor logs and send email alerts for errors
+  tools:
+  - email
+  - workspace
+```
+
+---
+
+## MCP Protocol Compliance
+
+### Initialization
+
+```json
+POST /mcp
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2024-11-05",
+    "capabilities": {},
+    "clientInfo": {"name": "agent", "version": "1.0"}
+  }
+}
+```
+
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "protocolVersion": "2024-11-05",
+    "serverInfo": {
+      "name": "email-tool",
+      "version": "1.0.0"
+    },
+    "capabilities": {
+      "tools": {}
+    }
+  }
+}
+```
+
+---
+
+## Health Check
 
 ```bash
-make lint
+curl http://email.default.svc.cluster.local/health
 ```
 
-Auto-fix linting issues:
+Response:
+```json
+{
+  "status": "ok",
+  "service": "email-tool",
+  "version": "1.0.0"
+}
+```
+
+---
+
+## Testing
+
+### Manual Testing
 
 ```bash
-make lint-fix
+# Test SMTP configuration
+curl -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"test_smtp","arguments":{}}}'
+
+# View configuration
+curl -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"email_config","arguments":{}}}'
+
+# Send test email
+curl -X POST http://localhost:8080/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"send_email","arguments":{"to":"test@example.com","subject":"Test","body":"This is a test"}}}'
 ```
 
-### Testing
-
-The project includes comprehensive test coverage using RSpec:
-
-- **Unit tests** for all 3 email tools (`send_email`, `test_smtp`, `email_config`)
-- **Integration tests** for tool loading and registry
-- **Mocked SMTP connections** using RSpec doubles to avoid external dependencies
-- **Environment variable testing** for configuration validation
-
-Test coverage includes:
-- Parameter validation (to, subject, body, from, cc, bcc, html)
-- SMTP configuration validation
-- Email address parsing and formatting
-- Error handling (missing config, connection errors, authentication failures)
-- TLS/non-TLS connection modes
-- Multiple recipient support (to, cc, bcc)
-- HTML vs plain text email modes
-- Configuration display (without exposing secrets)
-
-Run tests with `make spec` to execute the full test suite in Docker.
-
-## Documentation
-
-Generate API documentation with YARD:
+### Automated Tests
 
 ```bash
-make doc
+cd email
+bundle install
+bundle exec rspec
 ```
 
-Serve documentation locally on http://localhost:8808:
+---
 
-```bash
-make doc-serve
+## Security Best Practices
+
+### 1. Never Commit Credentials
+
+Always use Kubernetes secrets for SMTP credentials:
+
+```yaml
+# ❌ Bad - credentials in plain text
+env:
+- name: SMTP_PASSWORD
+  value: "my-password"
+
+# ✅ Good - credentials from secret
+env:
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: email-smtp
+      key: password
 ```
 
-Clean generated documentation:
+### 2. Use App-Specific Passwords
 
-```bash
-make doc-clean
+For providers like Gmail with 2FA enabled, use app-specific passwords:
+- Gmail: https://myaccount.google.com/apppasswords
+- Outlook: https://account.microsoft.com/security
+
+### 3. Enable TLS
+
+Always use TLS encryption (enabled by default):
+
+```yaml
+env:
+- name: SMTP_TLS
+  value: "true"
 ```
 
-## Security Considerations
+### 4. Restrict Network Access
 
-- **Never commit credentials**: Use environment variables or secrets management
-- **App-specific passwords**: For Gmail, use app-specific passwords, not your main password
-- **TLS encryption**: Always use TLS (enabled by default)
-- **Rate limiting**: Be aware of your SMTP provider's rate limits
-- **Validation**: The server does basic email validation but doesn't prevent spam
+Limit egress to only required SMTP servers:
 
-## Use Cases
+```yaml
+egress:
+- description: Allow specific SMTP server only
+  dns:
+  - "smtp.gmail.com"
+  ports:
+  - port: 587
+    protocol: TCP
+```
 
-- **Notifications**: Send alerts and notifications from automated systems
-- **AI Assistants**: Allow AI to send emails on behalf of users
-- **Workflows**: Integrate email into automated workflows
-- **Reports**: Send automated reports and summaries
-- **Alerts**: System monitoring and alerting
+### 5. Rate Limiting
 
-## Architecture
+Be aware of SMTP provider rate limits:
+- Gmail: 500 emails/day (free), 2000/day (Google Workspace)
+- SendGrid: Varies by plan
+- Mailgun: Varies by plan
 
-This image extends `based/svc/mcp:latest` and uses the MCP DSL to define email tools. The tools are defined in [tools/email.rb](tools/email.rb) and use Ruby's built-in `net/smtp` library along with the `mail` gem for email formatting.
+Implement delays in agents if sending many emails.
+
+---
 
 ## Troubleshooting
 
-### "SMTP configuration missing" error
-Make sure all required environment variables are set: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`
+### Common Issues
 
-### Connection timeout
-- Check firewall settings
-- Verify SMTP_HOST and SMTP_PORT are correct
-- Some networks block outbound SMTP connections
+**"Error: SMTP configuration missing"**
+- Cause: Required environment variables not set
+- Solution: Set `SMTP_HOST`, `SMTP_USER`, and `SMTP_PASSWORD`
 
-### Authentication failed
-- Verify credentials are correct
-- For Gmail, use an app-specific password
-- Check if 2FA is enabled on your account
+**"Error: No sender address specified"**
+- Cause: No `SMTP_FROM` and no `from` parameter
+- Solution: Set `SMTP_FROM` env var or provide `from` in request
 
-### Emails not received
-- Check spam folder
-- Verify recipient address is correct
-- Check SMTP provider logs for delivery status
+**"Authentication failed"**
+- Cause: Invalid credentials or 2FA issues
+- Solution:
+  - Verify credentials are correct
+  - Use app-specific password for Gmail/Outlook
+  - Check if account requires special configuration
+
+**"Connection timeout"**
+- Cause: Network/firewall blocking SMTP
+- Solution:
+  - Verify `SMTP_HOST` and `SMTP_PORT` are correct
+  - Check firewall/network policies
+  - Verify egress rules allow SMTP traffic
+
+**Emails not received**
+- Cause: Various delivery issues
+- Solution:
+  - Check recipient spam/junk folder
+  - Verify recipient address is correct
+  - Check SMTP provider logs
+  - Test with `test_smtp` tool first
+
+**"SSL/TLS error"**
+- Cause: Certificate or protocol mismatch
+- Solution:
+  - Verify correct port (587 for TLS, 465 for SSL)
+  - Check `SMTP_TLS` setting matches port
+  - Update SMTP server hostname if changed
+
+---
+
+## Performance Considerations
+
+### Email Delivery
+
+- Emails are sent synchronously (blocks until complete)
+- Typical send time: 1-5 seconds
+- For bulk emails, implement delays to avoid rate limits
+
+### Rate Limits
+
+Different providers have different limits:
+
+| Provider | Rate Limit | Notes |
+|----------|------------|-------|
+| Gmail (Free) | 500/day | Per account |
+| Google Workspace | 2000/day | Per account |
+| SendGrid Free | 100/day | Increase with paid plans |
+| Mailgun Free | 1000/month | Increase with paid plans |
+| Outlook | 300/day | Per account |
+
+### Optimization
+
+For high-volume email:
+1. Use transactional email services (SendGrid, Mailgun)
+2. Batch recipients in single email when appropriate
+3. Implement exponential backoff for retries
+4. Monitor provider logs for bounce/complaint rates
+
+---
+
+## Best Practices
+
+1. **Test configuration first**: Always run `test_smtp` before deploying
+2. **Use secrets**: Never hardcode credentials
+3. **Set sender address**: Configure `SMTP_FROM` for consistency
+4. **HTML with care**: Test HTML emails across clients
+5. **Monitor delivery**: Check provider dashboards regularly
+6. **Handle errors**: Always check email send results
+7. **Respect limits**: Don't exceed provider rate limits
+8. **Use templates**: Store email templates in workspace for reuse
+
+---
+
+## Version
+
+**Current Version:** 1.0.0
+
+**MCP Protocol:** 2024-11-05
+
+**Language Operator Compatibility:** v0.2.0+
+
+---
+
+## License
+
+MIT License - see [LICENSE](../LICENSE)
