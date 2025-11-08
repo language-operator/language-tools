@@ -14,7 +14,7 @@ When you describe a task in natural language, Language Operator synthesizes an a
 
 **Web Tool:** Your agent can search the internet and fetch web pages.
 **Email Tool:** Your agent can send and receive emails.
-**Filesystem Tool:** Your agent can remember things across executions.
+**Workspace Tool:** Your agent can remember things across executions.
 **Kubernetes Tool:** Your agent can manage itself and other workloads.
 **MCP Bridge Tool:** Your agent can access the entire MCP ecosystem.
 
@@ -86,7 +86,7 @@ spec:
 
 ---
 
-### 📁 Filesystem Tool
+### 📁 Workspace Tool
 **Persistent memory. Stateful workflows. Knowledge over time.**
 
 Your agent gets a shared workspace to read and write files across executions.
@@ -95,9 +95,9 @@ Your agent gets a shared workspace to read and write files across executions.
 apiVersion: langop.io/v1alpha1
 kind: LanguageTool
 metadata:
-  name: filesystem
+  name: workspace
 spec:
-  image: git.theryans.io/language-operator/filesystem-tool:latest
+  image: git.theryans.io/language-operator/workspace-tool:latest
   volumes:
   - name: workspace
     mountPath: /workspace
@@ -309,7 +309,7 @@ spec:
 
 **That's it.** Your agent can now call your custom tool via the MCP bridge.
 
-See [web/](./web/), [email/](./email/), or [filesystem/](./filesystem/) for reference implementations.
+See [web/](./web/), [email/](./email/), or [workspace/](./workspace/) for reference implementations.
 
 ---
 
@@ -435,7 +435,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 **Want to improve existing tools?**
 
-Browse the source in [web/](./web/), [email/](./email/), [filesystem/](./filesystem/), [k8s/](./k8s/), or [mcp/](./mcp/).
+Browse the source in [web/](./web/), [email/](./email/), [workspace/](./workspace/), [k8s/](./k8s/), or [mcp/](./mcp/).
 
 ---
 
