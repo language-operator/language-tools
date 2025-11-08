@@ -1,0 +1,18 @@
+source 'https://rubygems.org'
+
+source 'https://git.theryans.io/api/packages/language-operator/rubygems' do
+  gem 'language-operator', '~> 0.1.7'
+end
+
+gem 'rufus-scheduler', '~> 3.9'
+gem 'k8s-ruby', '~> 0.15'
+gem 'chronic', '~> 0.10'
+
+group :development, :test do
+  gem 'rspec', '~> 3.13'
+  gem 'webmock', '~> 3.23'
+  gem 'simplecov', '~> 0.22'
+  gem 'rubocop', '~> 1.60'
+  gem 'rubocop-performance', '~> 1.20'
+  gem 'yard', '~> 0.9.37'
+end

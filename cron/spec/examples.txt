@@ -1,0 +1,31 @@
+example_id                                   | status | run_time        |
+-------------------------------------------- | ------ | --------------- |
+./spec/integration/tool_loading_spec.rb[1:1] | passed | 0.00117 seconds |
+./spec/integration/tool_loading_spec.rb[1:2] | passed | 0.00183 seconds |
+./spec/integration/tool_loading_spec.rb[1:3] | passed | 0.00435 seconds |
+./spec/integration/tool_loading_spec.rb[1:4] | passed | 0.0034 seconds  |
+./spec/integration/tool_loading_spec.rb[1:5] | passed | 0.00141 seconds |
+./spec/tools/cron_spec.rb[1:1:1]             | passed | 0.0964 seconds  |
+./spec/tools/cron_spec.rb[1:1:2]             | passed | 0.00137 seconds |
+./spec/tools/cron_spec.rb[1:2:1]             | passed | 0.00126 seconds |
+./spec/tools/cron_spec.rb[1:2:2]             | passed | 0.0044 seconds  |
+./spec/tools/cron_spec.rb[1:2:3]             | passed | 0.00716 seconds |
+./spec/tools/cron_spec.rb[1:2:4]             | passed | 0.004 seconds   |
+./spec/tools/cron_spec.rb[1:2:5]             | passed | 0.00466 seconds |
+./spec/tools/cron_spec.rb[1:2:6]             | passed | 0.0041 seconds  |
+./spec/tools/cron_spec.rb[1:2:7]             | passed | 0.0045 seconds  |
+./spec/tools/cron_spec.rb[1:2:8]             | passed | 0.0044 seconds  |
+./spec/tools/cron_spec.rb[1:2:9]             | passed | 0.00276 seconds |
+./spec/tools/cron_spec.rb[1:2:10]            | passed | 0.00447 seconds |
+./spec/tools/cron_spec.rb[1:2:11]            | passed | 0.00128 seconds |
+./spec/tools/cron_spec.rb[1:3:1]             | passed | 0.00108 seconds |
+./spec/tools/cron_spec.rb[1:3:2]             | passed | 0.20627 seconds |
+./spec/tools/cron_spec.rb[1:3:3]             | passed | 0.00328 seconds |
+./spec/tools/cron_spec.rb[1:3:4]             | passed | 0.00275 seconds |
+./spec/tools/cron_spec.rb[1:3:5]             | passed | 0.00894 seconds |
+./spec/tools/cron_spec.rb[1:3:6]             | passed | 0.00193 seconds |
+./spec/tools/cron_spec.rb[1:4:1]             | passed | 0.00153 seconds |
+./spec/tools/cron_spec.rb[1:5:1]             | passed | 0.00145 seconds |
+./spec/tools/cron_spec.rb[1:6:1]             | passed | 0.00115 seconds |
+./spec/tools/cron_spec.rb[1:7:1]             | passed | 0.00129 seconds |
+./spec/tools/cron_spec.rb[1:8:1]             | passed | 0.00134 seconds |
