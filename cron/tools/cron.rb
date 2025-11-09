@@ -2,6 +2,7 @@ require 'rufus-scheduler'
 require 'chronic'
 require 'k8s-ruby'
 require 'json'
+require 'language_operator'
 
 # Helper module for cron operations
 module CronHelpers

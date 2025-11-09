@@ -2,6 +2,7 @@ require 'k8s-ruby'
 require 'faraday'
 require 'json'
 require 'uri'
+require 'language_operator'
 
 # MCP Bridge tools for connecting to external MCP servers
 

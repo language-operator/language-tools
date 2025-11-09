@@ -1,6 +1,7 @@
 require 'k8s-ruby'
 require 'yaml'
 require 'json'
+require 'language_operator'
 
 # Kubernetes tools for MCP
 

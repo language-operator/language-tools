@@ -1,5 +1,6 @@
 require 'net/smtp'
 require 'mail'
+require 'language_operator'
 
 # Email tools for MCP
 

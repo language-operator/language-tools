@@ -2,6 +2,7 @@
 
 require 'json'
 require 'uri'
+require 'language_operator'
 
 # Helper methods for web tools
 module WebHelpers

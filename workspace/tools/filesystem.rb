@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'pathname'
+require 'language_operator'
 
 # Filesystem tools for MCP
 
