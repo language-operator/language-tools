@@ -1,7 +1,7 @@
 name: cron
 displayName: Cron Scheduler
 description: Self-scheduling and temporal operations tool - enables agents to manage execution schedules
-image: git.theryans.io/language-operator/cron:latest
+image: git.theryans.io/language-operator/cron-tool:latest
 deploymentMode: service
 port: 80
 type: mcp

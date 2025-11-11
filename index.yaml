@@ -1,7 +1,40 @@
 ---
 version: '1.0'
-generated: '2025-11-08T01:05:50Z'
+generated: '2025-11-11T02:09:54Z'
 tools:
+  cron:
+    name: cron
+    displayName: Cron Scheduler
+    description: Self-scheduling and temporal operations tool - enables agents to
+      manage execution schedules
+    image: git.theryans.io/language-operator/cron-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    rbac:
+      clusterRole:
+        rules:
+        - apiGroups:
+          - langop.io
+          resources:
+          - languageagents
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+          - patch
+    egress:
+    - description: Allow Kubernetes API access
+      dns:
+      - kubernetes.default.svc.cluster.local
+      ports:
+      - port: 443
+        protocol: TCP
+  scheduler:
+    alias: cron
+  temporal:
+    alias: cron
   email:
     name: email
     displayName: Email Tool
@@ -22,36 +55,6 @@ tools:
         protocol: TCP
       - port: 993
         protocol: TCP
-  web:
-    name: web
-    displayName: Web Tool
-    description: Search the web and fetch web pages using DuckDuckGo
-    image: git.theryans.io/language-operator/web-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    egress:
-    - description: Allow HTTPS to DuckDuckGo
-      dns:
-      - "*.duckduckgo.com"
-      - duckduckgo.com
-      ports:
-      - port: 443
-        protocol: TCP
-    - description: Allow HTTPS to any web destination
-      dns:
-      - "*"
-      ports:
-      - port: 443
-        protocol: TCP
-      - port: 80
-        protocol: TCP
-  web-search:
-    alias: web
-  web-fetch:
-    alias: web
-  http:
-    alias: web
   k8s:
     name: k8s
     displayName: Kubernetes Tool
@@ -114,25 +117,6 @@ tools:
     alias: k8s
   kubernetes:
     alias: k8s
-  filesystem:
-    name: filesystem
-    displayName: Filesystem Tool
-    description: Persistent file I/O for agent workspace - read, write, and manage
-      files
-    image: git.theryans.io/language-operator/filesystem-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    volumes:
-    - name: workspace
-      mountPath: "/workspace"
-      persistentVolumeClaim:
-        claimName: agent-workspace
-        readWriteMany: true
-  workspace:
-    alias: filesystem
-  files:
-    alias: filesystem
   mcp:
     name: mcp
     displayName: MCP Bridge Tool
@@ -180,3 +164,37 @@ tools:
     alias: mcp
   mcp-bridge:
     alias: mcp
+  web:
+    name: web
+    displayName: Web Tool
+    description: Search the web and fetch web pages using DuckDuckGo
+    image: git.theryans.io/language-operator/web-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    egress:
+    - description: Allow HTTPS to DuckDuckGo
+      dns:
+      - "*.duckduckgo.com"
+      - duckduckgo.com
+      ports:
+      - port: 443
+        protocol: TCP
+    - description: Allow HTTPS to any web destination
+      dns:
+      - "*"
+      ports:
+      - port: 443
+        protocol: TCP
+      - port: 80
+        protocol: TCP
+  web-search:
+    alias: web
+  web-fetch:
+    alias: web
+  http:
+    alias: web
+  workspace:
+    alias: workspace
+  files:
+    alias: workspace

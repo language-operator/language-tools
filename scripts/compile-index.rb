@@ -8,7 +8,6 @@ require 'pathname'
 # Usage: ruby scripts/compile-index.rb
 
 class ManifestCompiler
-  TOOL_DIRS = %w[email web k8s filesystem mcp].freeze
   OUTPUT_FILE = 'index.yaml'
 
   def initialize
@@ -38,13 +37,9 @@ class ManifestCompiler
   private
 
   def discover_tools
-    TOOL_DIRS.each do |dir|
-      manifest_path = File.join(dir, 'manifest.yaml')
-
-      unless File.exist?(manifest_path)
-        @errors << "Missing manifest.yaml in #{dir}/"
-        next
-      end
+    # Auto-discover all directories containing manifest.yaml
+    Dir.glob('*/manifest.yaml').sort.each do |manifest_path|
+      dir = File.dirname(manifest_path)
 
       begin
         manifest = YAML.load_file(manifest_path)
