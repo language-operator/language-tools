@@ -1,7 +1,5 @@
 # Iterate
 
-Background: this is a early-phase project that works exclusively in main, and each task is a patch release.
-
 Follow these directions closely:
 
 1. Use the ForgeJo tool to find the top issue for this repository (language-operator/language-tools).
