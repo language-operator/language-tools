@@ -2,7 +2,7 @@
 # This Makefile uses the shared tools.mk for common targets
 
 # Image configuration
-IMAGE_NAME := git.theryans.io/language-operator/web-tool
+IMAGE_NAME := ghcr.io/language-operator/web-tool
 TOOL_NAME := web
 
 # Include shared targets

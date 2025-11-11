@@ -1,4 +1,4 @@
-FROM git.theryans.io/language-operator/base:latest
+FROM ghcr.io/language-operator/base:latest
 
 # Ensure we're running as root for installation
 USER root

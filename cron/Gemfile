@@ -1,8 +1,6 @@
 source 'https://rubygems.org'
 
-source 'https://git.theryans.io/api/packages/language-operator/rubygems' do
-  gem 'language-operator', '~> 0.1.15'
-end
+gem 'language-operator', '~> 0.1.30'
 
 gem 'rufus-scheduler', '~> 3.9'
 gem 'k8s-ruby', '~> 0.15'

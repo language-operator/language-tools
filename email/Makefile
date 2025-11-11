@@ -2,7 +2,7 @@
 # This Makefile uses the shared tools.mk for common targets
 
 # Image configuration
-IMAGE_NAME := git.theryans.io/language-operator/email-tool
+IMAGE_NAME := ghcr.io/language-operator/email-tool
 TOOL_NAME := email
 
 # SMTP configuration for testing (override these)

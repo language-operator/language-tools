@@ -18,7 +18,7 @@ on:
         type: boolean
 
 env:
-  REGISTRY: git.theryans.io
+  REGISTRY: ghcr.io
   IMAGE_PREFIX: language-operator
 
 jobs:

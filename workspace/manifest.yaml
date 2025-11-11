@@ -1,7 +1,7 @@
 name: workspace
 displayName: Workspace Tool
 description: Persistent file I/O for agent workspace - read, write, and manage files
-image: git.theryans.io/language-operator/workspace-tool:latest
+image: ghcr.io/language-operator/workspace-tool:latest
 deploymentMode: service
 port: 80
 type: mcp

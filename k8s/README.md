@@ -681,7 +681,7 @@ kind: LanguageTool
 metadata:
   name: k8s
 spec:
-  image: git.theryans.io/language-operator/k8s-tool:latest
+  image: ghcr.io/language-operator/k8s-tool:latest
   deploymentMode: service
   port: 80
   type: mcp
@@ -715,7 +715,7 @@ kind: LanguageTool
 metadata:
   name: k8s-readonly
 spec:
-  image: git.theryans.io/language-operator/k8s-tool:latest
+  image: ghcr.io/language-operator/k8s-tool:latest
   deploymentMode: service
   port: 80
   type: mcp
@@ -1035,7 +1035,7 @@ kind: LanguageTool
 metadata:
   name: k8s
 spec:
-  image: git.theryans.io/language-operator/k8s-tool:latest
+  image: ghcr.io/language-operator/k8s-tool:latest
   resources:
     requests:
       memory: "128Mi"

@@ -1,7 +1,7 @@
 name: mcp
 displayName: MCP Bridge Tool
 description: Universal bridge to external MCP servers - discover and call tools from the MCP ecosystem
-image: git.theryans.io/language-operator/mcp-tool:latest
+image: ghcr.io/language-operator/mcp-tool:latest
 deploymentMode: service
 port: 80
 type: mcp

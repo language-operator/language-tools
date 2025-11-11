@@ -1,4 +1,4 @@
-FROM git.theryans.io/language-operator/base:latest
+FROM ghcr.io/language-operator/base:latest
 
 USER root
 RUN apk add --no-cache ruby ruby-dev ruby-bundler build-base ca-certificates

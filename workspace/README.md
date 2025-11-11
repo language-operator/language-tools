@@ -442,7 +442,7 @@ kind: LanguageTool
 metadata:
   name: workspace
 spec:
-  image: git.theryans.io/language-operator/workspace-tool:latest
+  image: ghcr.io/language-operator/workspace-tool:latest
   deploymentMode: service
   port: 80
   type: mcp
@@ -758,7 +758,7 @@ kind: LanguageTool
 metadata:
   name: workspace
 spec:
-  image: git.theryans.io/language-operator/workspace-tool:latest
+  image: ghcr.io/language-operator/workspace-tool:latest
   env:
   - name: LOG_LEVEL
     value: debug

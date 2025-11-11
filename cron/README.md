@@ -675,7 +675,7 @@ kind: LanguageTool
 metadata:
   name: cron
 spec:
-  image: git.theryans.io/language-operator/cron-tool:latest
+  image: ghcr.io/language-operator/cron-tool:latest
   deploymentMode: service
   port: 80
   type: mcp

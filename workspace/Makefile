@@ -2,7 +2,7 @@
 # This Makefile uses the shared tools.mk for common targets
 
 # Image configuration
-IMAGE_NAME := git.theryans.io/language-operator/workspace-tool
+IMAGE_NAME := ghcr.io/language-operator/workspace-tool
 TOOL_NAME := workspace
 
 # Include shared targets

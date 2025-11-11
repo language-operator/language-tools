@@ -1,7 +1,7 @@
 name: k8s
 displayName: Kubernetes Tool
 description: Native Kubernetes operations - manage resources, pods, logs, and CRDs
-image: git.theryans.io/language-operator/k8s-tool:latest
+image: ghcr.io/language-operator/k8s-tool:latest
 deploymentMode: service
 port: 80
 type: mcp

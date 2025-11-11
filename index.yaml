@@ -1,13 +1,13 @@
 ---
 version: '1.0'
-generated: '2025-11-11T02:09:54Z'
+generated: '2025-11-11T20:46:00Z'
 tools:
   cron:
     name: cron
     displayName: Cron Scheduler
     description: Self-scheduling and temporal operations tool - enables agents to
       manage execution schedules
-    image: git.theryans.io/language-operator/cron-tool:latest
+    image: ghcr.io/language-operator/cron-tool:latest
     deploymentMode: service
     port: 80
     type: mcp
@@ -39,7 +39,7 @@ tools:
     name: email
     displayName: Email Tool
     description: Send and receive emails via SMTP/IMAP
-    image: git.theryans.io/language-operator/email-tool:latest
+    image: ghcr.io/language-operator/email-tool:latest
     deploymentMode: service
     port: 80
     type: mcp
@@ -60,7 +60,7 @@ tools:
     displayName: Kubernetes Tool
     description: Native Kubernetes operations - manage resources, pods, logs, and
       CRDs
-    image: git.theryans.io/language-operator/k8s-tool:latest
+    image: ghcr.io/language-operator/k8s-tool:latest
     deploymentMode: service
     port: 80
     type: mcp
@@ -122,7 +122,7 @@ tools:
     displayName: MCP Bridge Tool
     description: Universal bridge to external MCP servers - discover and call tools
       from the MCP ecosystem
-    image: git.theryans.io/language-operator/mcp-tool:latest
+    image: ghcr.io/language-operator/mcp-tool:latest
     deploymentMode: service
     port: 80
     type: mcp
@@ -168,7 +168,7 @@ tools:
     name: web
     displayName: Web Tool
     description: Search the web and fetch web pages using DuckDuckGo
-    image: git.theryans.io/language-operator/web-tool:latest
+    image: ghcr.io/language-operator/web-tool:latest
     deploymentMode: service
     port: 80
     type: mcp

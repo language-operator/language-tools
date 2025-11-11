@@ -2,7 +2,7 @@
 
 **Everything your autonomous agents need. Nothing they don't.**
 
-This is the official tool registry for [Language Operator](https://git.theryans.io/language-operator/language-operator)—a curated collection of MCP-compatible tools that give your agents superpowers.
+This is the official tool registry for [Language Operator](https://github.com/language-operator/language-operator)—a curated collection of MCP-compatible tools that give your agents superpowers.
 
 **The philosophy:** Five essential tools. Zero bloat. Maximum capability.
 
@@ -44,7 +44,7 @@ kind: LanguageTool
 metadata:
   name: web
 spec:
-  image: git.theryans.io/language-operator/web-tool:latest
+  image: ghcr.io/language-operator/web-tool:latest
 ```
 
 **What it does:**
@@ -70,7 +70,7 @@ kind: LanguageTool
 metadata:
   name: email
 spec:
-  image: git.theryans.io/language-operator/email-tool:latest
+  image: ghcr.io/language-operator/email-tool:latest
   authRequired: true
 ```
 
@@ -97,7 +97,7 @@ kind: LanguageTool
 metadata:
   name: workspace
 spec:
-  image: git.theryans.io/language-operator/workspace-tool:latest
+  image: ghcr.io/language-operator/workspace-tool:latest
   volumes:
   - name: workspace
     mountPath: /workspace
@@ -128,7 +128,7 @@ kind: LanguageTool
 metadata:
   name: k8s
 spec:
-  image: git.theryans.io/language-operator/k8s-tool:latest
+  image: ghcr.io/language-operator/k8s-tool:latest
   rbac:
     clusterRole:
       rules:
@@ -160,7 +160,7 @@ kind: LanguageTool
 metadata:
   name: mcp
 spec:
-  image: git.theryans.io/language-operator/mcp-tool:latest
+  image: ghcr.io/language-operator/mcp-tool:latest
 ```
 
 **What it does:**
@@ -186,7 +186,7 @@ kind: LanguageTool
 metadata:
   name: web
 spec:
-  image: git.theryans.io/language-operator/web-tool:latest
+  image: ghcr.io/language-operator/web-tool:latest
   deploymentMode: service
   port: 80
 ```
@@ -267,7 +267,7 @@ tools:
     name: web
     displayName: Web Tool
     description: Search the web and fetch web pages
-    image: git.theryans.io/language-operator/web-tool:latest
+    image: ghcr.io/language-operator/web-tool:latest
     type: mcp
     egress:
     - description: Allow HTTPS to DuckDuckGo
@@ -377,7 +377,7 @@ livenessProbe:
 Tools are versioned. Update the image tag and Language Operator rolls out the new version:
 ```yaml
 spec:
-  image: git.theryans.io/language-operator/web-tool:v1.2.0
+  image: ghcr.io/language-operator/web-tool:v1.2.0
 ```
 
 ---
@@ -402,7 +402,7 @@ Tools exist to serve agents, not the other way around.
 
 ### Install Language Operator
 ```bash
-helm install language-operator oci://git.theryans.io/helm/language-operator
+helm install language-operator oci://ghcr.io/language-operator/helm/language-operator
 ```
 
 ### Create an Agent

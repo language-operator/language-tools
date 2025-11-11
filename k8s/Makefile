@@ -2,7 +2,7 @@
 # This Makefile uses the shared tools.mk for common targets
 
 # Image configuration
-IMAGE_NAME := git.theryans.io/language-operator/k8s-tool
+IMAGE_NAME := ghcr.io/language-operator/k8s-tool
 TOOL_NAME := k8s
 
 # Include shared targets

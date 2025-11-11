@@ -2,7 +2,7 @@
 # This Makefile uses the shared tools.mk for common targets
 
 # Image configuration
-IMAGE_NAME := git.theryans.io/language-operator/mcp-tool
+IMAGE_NAME := ghcr.io/language-operator/mcp-tool
 TOOL_NAME := mcp
 
 # Include shared targets

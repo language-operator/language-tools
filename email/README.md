@@ -361,7 +361,7 @@ kind: LanguageTool
 metadata:
   name: email
 spec:
-  image: git.theryans.io/language-operator/email-tool:latest
+  image: ghcr.io/language-operator/email-tool:latest
   authRequired: true
   egress:
   - description: Allow SMTP/IMAP connections
@@ -402,7 +402,7 @@ kind: LanguageTool
 metadata:
   name: email
 spec:
-  image: git.theryans.io/language-operator/email-tool:latest
+  image: ghcr.io/language-operator/email-tool:latest
   deploymentMode: service
   port: 80
   type: mcp

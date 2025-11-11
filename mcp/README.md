@@ -440,7 +440,7 @@ kind: LanguageTool
 metadata:
   name: mcp
 spec:
-  image: git.theryans.io/language-operator/mcp-tool:latest
+  image: ghcr.io/language-operator/mcp-tool:latest
   authRequired: true
   egress:
   - description: Allow access to all cluster services
@@ -469,7 +469,7 @@ kind: LanguageTool
 metadata:
   name: mcp
 spec:
-  image: git.theryans.io/language-operator/mcp-tool:latest
+  image: ghcr.io/language-operator/mcp-tool:latest
   deploymentMode: service
   port: 80
   type: mcp

@@ -2,7 +2,7 @@
 # Include this file from individual tool Makefiles
 #
 # Required variables to be set by including Makefile:
-#   IMAGE_NAME - Full image name (e.g., git.theryans.io/language-operator/email-tool)
+#   IMAGE_NAME - Full image name (e.g., ghcr.io/language-operator/email-tool)
 #   TOOL_NAME  - Tool name for display (e.g., email, web)
 #
 # Optional variables:

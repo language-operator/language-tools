@@ -498,7 +498,7 @@ kind: LanguageTool
 metadata:
   name: web
 spec:
-  image: git.theryans.io/language-operator/web-tool:latest
+  image: ghcr.io/language-operator/web-tool:latest
   egress:
   # Allow DuckDuckGo for search
   - description: Allow HTTPS to DuckDuckGo
@@ -546,7 +546,7 @@ kind: LanguageTool
 metadata:
   name: web
 spec:
-  image: git.theryans.io/language-operator/web-tool:latest
+  image: ghcr.io/language-operator/web-tool:latest
   deploymentMode: service
   port: 80
   type: mcp
