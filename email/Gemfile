@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'language-operator', '~> 0.1.30'
+gem 'language-operator', '~> 0.1.36'
 
 # Email functionality
 gem 'mail', '~> 2.8'
