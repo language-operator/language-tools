@@ -16,5 +16,4 @@ volumes:
 
 # Optional aliases for this tool
 aliases:
-  - workspace
   - files

@@ -1,6 +1,6 @@
 ---
 version: '1.0'
-generated: '2025-11-17T02:46:34Z'
+generated: '2025-11-17T02:57:27Z'
 tools:
   cron:
     name: cron
@@ -195,6 +195,19 @@ tools:
   http:
     alias: web
   workspace:
-    alias: workspace
+    name: workspace
+    displayName: Workspace Tool
+    description: Persistent file I/O for agent workspace - read, write, and manage
+      files
+    image: ghcr.io/language-operator/workspace-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+    volumes:
+    - name: workspace
+      mountPath: "/workspace"
+      persistentVolumeClaim:
+        claimName: agent-workspace
+        readWriteMany: true
   files:
     alias: workspace
