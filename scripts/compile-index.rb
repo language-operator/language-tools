@@ -74,7 +74,7 @@ class ManifestCompiler
       end
 
       # Validate deployment mode
-      valid_modes = %w[service job]
+      valid_modes = %w[service job sidecar]
       if manifest['deploymentMode'] && !valid_modes.include?(manifest['deploymentMode'])
         @errors << "Tool '#{name}' has invalid deploymentMode: #{manifest['deploymentMode']}"
       end

@@ -2,7 +2,7 @@ name: workspace
 displayName: Workspace Tool
 description: Persistent file I/O for agent workspace - read, write, and manage files
 image: ghcr.io/language-operator/workspace-tool:latest
-deploymentMode: service
+deploymentMode: sidecar
 port: 80
 type: mcp
 
@@ -10,9 +10,6 @@ type: mcp
 volumes:
   - name: workspace
     mountPath: /workspace
-    persistentVolumeClaim:
-      claimName: agent-workspace
-      readWriteMany: true
 
 # Optional aliases for this tool
 aliases:
