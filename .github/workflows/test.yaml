@@ -11,16 +11,16 @@ on:
 
 jobs:
   test-tools:
-    runs-on: builder
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         tool: [k8s, web, email, workspace, mcp, cron]
     steps:
       - name: Checkout code
-        uses: https://github.com/actions/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Set up Ruby
-        uses: https://github.com/ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
         env:
