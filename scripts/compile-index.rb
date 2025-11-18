@@ -95,19 +95,16 @@ class ManifestCompiler
     }
 
     @tools.each do |name, manifest|
-      # Add the main tool entry
+      # Add the main tool entry (strip out aliases field since we don't use it)
       @index['tools'][name] = manifest.reject { |k| k == 'aliases' }
-
-      # Add alias entries
-      aliases = manifest['aliases'] || []
-      aliases.each do |alias_name|
-        @index['tools'][alias_name] = { 'alias' => name }
-      end
     end
   end
 
   def write_output
-    File.write(OUTPUT_FILE, @index.to_yaml)
+    # Write YAML with proper formatting to avoid 'alias' keyword conflicts
+    # Some YAML parsers (like Go's yaml.v2/v3) treat 'alias:' as a special keyword
+    yaml_content = @index.to_yaml
+    File.write(OUTPUT_FILE, yaml_content)
   end
 end
 

@@ -1,6 +1,6 @@
 ---
 version: '1.0'
-generated: '2025-11-17T03:15:20Z'
+generated: '2025-11-18T19:40:39Z'
 tools:
   cron:
     name: cron
@@ -31,10 +31,6 @@ tools:
       ports:
       - port: 443
         protocol: TCP
-  scheduler:
-    alias: cron
-  temporal:
-    alias: cron
   email:
     name: email
     displayName: Email Tool
@@ -113,10 +109,6 @@ tools:
       ports:
       - port: 443
         protocol: TCP
-  kubectl:
-    alias: k8s
-  kubernetes:
-    alias: k8s
   mcp:
     name: mcp
     displayName: MCP Bridge Tool
@@ -160,10 +152,6 @@ tools:
         protocol: UDP
       - port: 53
         protocol: TCP
-  mcp-client:
-    alias: mcp
-  mcp-bridge:
-    alias: mcp
   web:
     name: web
     displayName: Web Tool
@@ -188,12 +176,6 @@ tools:
         protocol: TCP
       - port: 80
         protocol: TCP
-  web-search:
-    alias: web
-  web-fetch:
-    alias: web
-  http:
-    alias: web
   workspace:
     name: workspace
     displayName: Workspace Tool
@@ -206,5 +188,3 @@ tools:
     volumes:
     - name: workspace
       mountPath: "/workspace"
-  files:
-    alias: workspace
