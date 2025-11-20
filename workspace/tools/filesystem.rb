@@ -155,18 +155,18 @@ end
 
 # Write file tool
 tool "write_file" do
-  description "Create new file or overwrite existing file in workspace"
+  description "Create new file or completely overwrite existing file in workspace. IMPORTANT: This replaces the entire file contents. To append to a file, first read the existing content, then write the combined content."
 
   parameter "path" do
     type :string
     required true
-    description "File path relative to /workspace (or absolute path within /workspace)"
+    description "File path relative to /workspace (or absolute path within /workspace). Example: 'story.txt' or 'data/notes.txt'"
   end
 
   parameter "content" do
     type :string
     required true
-    description "Content to write to file"
+    description "Complete file contents to write (replaces any existing content). Can be multi-line text - use \\n for line breaks. Can be empty string for empty file. Example: 'Hello\\nWorld' for two lines of text."
   end
 
   execute do |params|

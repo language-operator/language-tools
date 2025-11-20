@@ -137,11 +137,13 @@ Read last 50 lines:
 
 ### 2. write_file
 
-Create new file or overwrite existing file in workspace.
+Create new file or completely overwrite existing file in workspace.
+
+> **⚠️ IMPORTANT:** This tool replaces the entire file contents. To append to an existing file, you must first read the file, combine the contents, then write back the combined content.
 
 **Parameters:**
 - `path` (string, required) - File path relative to /workspace (or absolute path within /workspace)
-- `content` (string, required) - Content to write to file
+- `content` (string, required) - Complete file contents to write (replaces any existing content)
 
 **Returns:** Success message with bytes written
 
@@ -158,6 +160,17 @@ Create new file:
 }
 ```
 
+Write multi-line file:
+```json
+{
+  "name": "write_file",
+  "arguments": {
+    "path": "story.txt",
+    "content": "Once upon a time.\nThere was a brave knight.\nThe end."
+  }
+}
+```
+
 Write JSON data:
 ```json
 {
@@ -169,10 +182,96 @@ Write JSON data:
 }
 ```
 
+Create empty file:
+```json
+{
+  "name": "write_file",
+  "arguments": {
+    "path": "placeholder.txt",
+    "content": ""
+  }
+}
+```
+
+**Append Pattern (Read → Combine → Write):**
+
+To add content to an existing file, use this three-step pattern:
+
+```json
+// Step 1: Read existing file
+{
+  "name": "read_file",
+  "arguments": {
+    "path": "story.txt"
+  }
+}
+// Returns: "Once upon a time.\n"
+
+// Step 2: Combine old content with new content in your code
+// combined_content = existing_content + new_sentence
+
+// Step 3: Write combined content back
+{
+  "name": "write_file",
+  "arguments": {
+    "path": "story.txt",
+    "content": "Once upon a time.\nThere was a brave knight.\n"
+  }
+}
+```
+
 **Behavior:**
 - Creates parent directories automatically if they don't exist
-- Overwrites existing files completely
+- **Overwrites existing files completely** - entire file is replaced
 - Writes files with UTF-8 encoding
+- Empty string is valid for creating empty files
+
+**Common Mistakes:**
+
+❌ **Don't pass empty arguments:**
+```json
+{
+  "name": "write_file",
+  "arguments": {}  // ERROR: Missing required parameters
+}
+```
+
+✅ **Both parameters are required:**
+```json
+{
+  "name": "write_file",
+  "arguments": {
+    "path": "file.txt",
+    "content": "content here"
+  }
+}
+```
+
+❌ **Don't write just new content when appending:**
+```json
+// This REPLACES the entire file with just the new sentence!
+{
+  "name": "write_file",
+  "arguments": {
+    "path": "story.txt",
+    "content": "There was a brave knight.\n"  // Old content is LOST
+  }
+}
+```
+
+✅ **Read first, then write combined content:**
+```json
+// First read to get existing content
+{"name": "read_file", "arguments": {"path": "story.txt"}}
+// Then write the complete combined content
+{
+  "name": "write_file",
+  "arguments": {
+    "path": "story.txt",
+    "content": "Once upon a time.\nThere was a brave knight.\n"
+  }
+}
+```
 
 **Error Handling:**
 - Failed to create directory → `Error: Failed to create parent directory - <reason>`
