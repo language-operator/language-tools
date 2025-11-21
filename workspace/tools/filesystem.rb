@@ -20,6 +20,14 @@ module FilesystemHelpers
     # Reject empty paths
     return LanguageOperator::Errors.empty_field("Path") if path.empty?
 
+    # Strip /workspace prefix if present (e.g., /workspace/story.txt -> /story.txt or story.txt)
+    # This handles cases where LLMs include the workspace prefix in their paths
+    if path.start_with?('/workspace/')
+      path = path.sub(%r{^/workspace/}, '')
+    elsif path == '/workspace'
+      path = '/'
+    end
+
     # Build absolute path
     # All paths are relative to workspace root
     absolute_path = if path.start_with?('/')

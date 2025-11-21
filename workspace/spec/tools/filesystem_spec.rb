@@ -100,5 +100,33 @@ RSpec.describe 'Filesystem Tools' do
       # Should successfully access /workspace/testdir
       expect(result).not_to include('Access denied')
     end
+
+    it 'handles /workspace/file.txt paths correctly in write_file' do
+      # LLMs sometimes include the workspace prefix in their paths
+      # e.g., "/workspace/story.txt" should work correctly
+      tool = registry.get('write_file')
+      result = tool.call('path' => '/workspace/story.txt', 'content' => 'test content')
+      # Should successfully write the file
+      expect(result).to include('Successfully wrote')
+      expect(result).not_to include('Error')
+
+      # Verify the file was written to the correct location
+      read_tool = registry.get('read_file')
+      read_result = read_tool.call('path' => 'story.txt')
+      expect(read_result).to eq('test content')
+    end
+
+    it 'handles /workspace/file.txt paths correctly in get_file_info' do
+      # First create a file
+      write_tool = registry.get('write_file')
+      write_tool.call('path' => 'test.txt', 'content' => 'data')
+
+      # Now try to get file info using /workspace/test.txt format
+      tool = registry.get('get_file_info')
+      result = tool.call('path' => '/workspace/test.txt')
+      # Should successfully get file info
+      expect(result).not_to include('Path not found')
+      expect(result).to include('Type: file')
+    end
   end
 end
