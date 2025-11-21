@@ -7,6 +7,15 @@ require 'tmpdir'
 # Disable real network connections
 WebMock.disable_net_connect!(allow_localhost: false)
 
+# Set up temporary workspace root for tests
+TEST_WORKSPACE_ROOT = Dir.mktmpdir('workspace-test')
+ENV['WORKSPACE_ROOT'] = TEST_WORKSPACE_ROOT
+
+# Clean up after all tests complete
+at_exit do
+  FileUtils.rm_rf(TEST_WORKSPACE_ROOT) if File.exist?(TEST_WORKSPACE_ROOT)
+end
+
 # Helper to load filesystem tools
 def load_filesystem_tools
   registry = LanguageOperator::Dsl::Registry.new

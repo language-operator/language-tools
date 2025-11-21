@@ -86,7 +86,8 @@ RSpec.describe 'Filesystem Tools' do
       result = tool.call('path' => '/')
       # Should successfully list workspace root, not get access denied
       expect(result).not_to include('Access denied')
-      expect(result).to include('Contents of')
+      # Result should be either "Directory is empty" or "Contents of" depending on workspace state
+      expect(result).to match(/Directory is empty|Contents of/)
     end
 
     it 'treats "/subdir" as workspace-relative in list_directory' do

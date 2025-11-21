@@ -7,7 +7,8 @@ require 'language_operator'
 # Helper methods for filesystem tools
 module FilesystemHelpers
   # Workspace root directory - all operations must be within this directory
-  WORKSPACE_ROOT = '/workspace'
+  # Can be overridden via WORKSPACE_ROOT environment variable for testing
+  WORKSPACE_ROOT = ENV.fetch('WORKSPACE_ROOT', '/workspace')
 
   # Validate and normalize a path to ensure it's within workspace
   # @param path [String] Path to validate (relative or absolute)
