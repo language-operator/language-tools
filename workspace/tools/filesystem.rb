@@ -20,11 +20,12 @@ module FilesystemHelpers
     return LanguageOperator::Errors.empty_field("Path") if path.empty?
 
     # Build absolute path
+    # All paths are relative to workspace root
     absolute_path = if path.start_with?('/')
-      # Already absolute
-      path
+      # Treat leading slash as relative to workspace root
+      File.join(WORKSPACE_ROOT, path)
     else
-      # Relative to workspace root
+      # No leading slash - still relative to workspace root
       File.join(WORKSPACE_ROOT, path)
     end
 
@@ -119,7 +120,7 @@ tool "read_file" do
   parameter "path" do
     type :string
     required true
-    description "File path relative to /workspace (or absolute path within /workspace)"
+    description "File path relative to workspace root. Use '/' for workspace root, 'file.txt' or '/file.txt' for files in root, 'subdir/file.txt' or '/subdir/file.txt' for nested paths. Leading slash is optional."
   end
 
   parameter "head" do

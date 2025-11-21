@@ -80,5 +80,24 @@ RSpec.describe 'Filesystem Tools' do
       expect(result).to include('Error')
       expect(result).to include('Access denied')
     end
+
+    it 'treats "/" as workspace root in list_directory' do
+      tool = registry.get('list_directory')
+      result = tool.call('path' => '/')
+      # Should successfully list workspace root, not get access denied
+      expect(result).not_to include('Access denied')
+      expect(result).to include('Contents of')
+    end
+
+    it 'treats "/subdir" as workspace-relative in list_directory' do
+      # Create a test directory first
+      create_tool = registry.get('create_directory')
+      create_tool.call('path' => 'testdir')
+
+      tool = registry.get('list_directory')
+      result = tool.call('path' => '/testdir')
+      # Should successfully access /workspace/testdir
+      expect(result).not_to include('Access denied')
+    end
   end
 end
