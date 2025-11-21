@@ -137,8 +137,14 @@ tool "read_file" do
   end
 
   execute do |params|
+    # Treat 0 or nil as "not specified"
+    head = params['head']&.to_i
+    tail = params['tail']&.to_i
+    head = nil if head&.zero?
+    tail = nil if tail&.zero?
+
     # Cannot specify both head and tail
-    if params['head'] && params['tail']
+    if head && tail
       next "Error: Cannot specify both 'head' and 'tail' parameters"
     end
 
@@ -147,11 +153,7 @@ tool "read_file" do
     next validated_path if validated_path.start_with?('Error:')
 
     # Read file
-    FilesystemHelpers.safe_read(
-      validated_path,
-      head: params['head']&.to_i,
-      tail: params['tail']&.to_i
-    )
+    FilesystemHelpers.safe_read(validated_path, head: head, tail: tail)
   end
 end
 
