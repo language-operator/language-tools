@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 
 RSpec.describe 'web_headers tool' do
@@ -15,10 +17,10 @@ RSpec.describe 'web_headers tool' do
     it 'returns HTTP headers' do
       stub_request(:head, 'https://example.com/')
         .to_return(status: 200, headers: {
-          'Content-Type' => 'text/html',
-          'Server' => 'nginx/1.18.0',
-          'Cache-Control' => 'max-age=3600'
-        })
+                     'Content-Type' => 'text/html',
+                     'Server' => 'nginx/1.18.0',
+                     'Cache-Control' => 'max-age=3600'
+                   })
 
       tool = registry.get('web_headers')
       result = tool.call('url' => 'https://example.com/')

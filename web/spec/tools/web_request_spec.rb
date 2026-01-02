@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 
 RSpec.describe 'web_request tool' do
@@ -70,7 +72,6 @@ RSpec.describe 'web_request tool' do
       expect(result).to include('Status: 204 No Content')
       expect(result).to include('Body: (empty)')
     end
-
 
     it 'makes HEAD requests' do
       stub_request(:head, 'https://api.example.com/users')

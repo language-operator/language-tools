@@ -1,6 +1,6 @@
 name: web
 displayName: Web Tool
-description: Search the web and fetch web pages using DuckDuckGo
+description: Web search via DuckDuckGo, HTTP client with full method support, content fetching and parsing, status checking, and header inspection
 image: ghcr.io/language-operator/web-tool:latest
 deploymentMode: service
 port: 80

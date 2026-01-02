@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 
 RSpec.describe 'web_search tool' do
@@ -14,7 +16,7 @@ RSpec.describe 'web_search tool' do
 
   describe 'successful search with results' do
     it 'returns formatted search results' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=ruby/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=ruby})
         .to_return(status: 200, body: ddg_search_html)
 
       tool = registry.get('web_search')
@@ -28,19 +30,19 @@ RSpec.describe 'web_search tool' do
     end
 
     it 'respects max_results limit' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=ruby/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=ruby})
         .to_return(status: 200, body: ddg_search_html)
 
       tool = registry.get('web_search')
       result = tool.call('query' => 'ruby', 'max_results' => 2)
 
       # Count the number of results (each result has a "URL:" line)
-      url_count = result.scan(/URL:/).length
+      url_count = result.scan('URL:').length
       expect(url_count).to eq(2)
     end
 
     it 'uses default max_results of 5 when not specified' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=ruby/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=ruby})
         .to_return(status: 200, body: ddg_search_html)
 
       tool = registry.get('web_search')
@@ -53,7 +55,7 @@ RSpec.describe 'web_search tool' do
 
   describe 'search with no results' do
     it 'returns no results message' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=nosuchquery123xyz/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=nosuchquery123xyz})
         .to_return(status: 200, body: ddg_no_results_html)
 
       tool = registry.get('web_search')
@@ -87,7 +89,7 @@ RSpec.describe 'web_search tool' do
 
   describe 'URL cleanup' do
     it 'removes DuckDuckGo redirect wrapper from URLs' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=test/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=test})
         .to_return(status: 200, body: ddg_search_html)
 
       tool = registry.get('web_search')
@@ -104,7 +106,7 @@ RSpec.describe 'web_search tool' do
 
   describe 'error handling' do
     it 'returns error message when HTTP request fails' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=test/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=test})
         .to_return(status: 500, body: 'Internal Server Error')
 
       tool = registry.get('web_search')
@@ -115,7 +117,7 @@ RSpec.describe 'web_search tool' do
     end
 
     it 'returns error message on network timeout' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=timeout/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=timeout})
         .to_timeout
 
       tool = registry.get('web_search')
@@ -133,7 +135,7 @@ RSpec.describe 'web_search tool' do
     end
 
     it 'accepts optional max_results parameter' do
-      stub_request(:get, /html\.duckduckgo\.com\/html\/\?q=ruby/)
+      stub_request(:get, %r{html\.duckduckgo\.com/html/\?q=ruby})
         .to_return(status: 200, body: ddg_search_html)
 
       tool = registry.get('web_search')

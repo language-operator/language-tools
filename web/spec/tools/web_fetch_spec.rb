@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../spec_helper'
 
 RSpec.describe 'web_fetch tool' do
@@ -51,7 +53,7 @@ RSpec.describe 'web_fetch tool' do
     end
 
     it 'truncates content to 2000 characters' do
-      long_content = '<html><body><p>' + ('a' * 3000) + '</p></body></html>'
+      long_content = "<html><body><p>#{'a' * 3000}</p></body></html>"
 
       stub_request(:get, 'https://example.com/long')
         .to_return(status: 200, body: long_content)
@@ -90,7 +92,7 @@ RSpec.describe 'web_fetch tool' do
     end
 
     it 'does not strip tags or truncate in HTML mode' do
-      long_html = '<html><body>' + ('<p>test</p>' * 500) + '</body></html>'
+      long_html = "<html><body>#{'<p>test</p>' * 500}</body></html>"
 
       stub_request(:get, 'https://example.com/long')
         .to_return(status: 200, body: long_html)

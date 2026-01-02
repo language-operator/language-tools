@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Web search and scraping tools for MCP
 
 require 'json'
@@ -11,29 +13,29 @@ module WebHelpers
 
   # HTML stripping patterns
   HTML_STRIP_PATTERNS = [
-    /<script[^>]*>.*?<\/script>/im,
-    /<style[^>]*>.*?<\/style>/im,
+    %r{<script[^>]*>.*?</script>}im,
+    %r{<style[^>]*>.*?</style>}im,
     /<[^>]+>/
   ].freeze
 
   # Common HTTP status codes
   HTTP_STATUS_CODES = {
-    200 => "OK",
-    201 => "Created",
-    204 => "No Content",
-    301 => "Moved Permanently",
-    302 => "Found (Redirect)",
-    304 => "Not Modified",
-    400 => "Bad Request",
-    401 => "Unauthorized",
-    403 => "Forbidden",
-    404 => "Not Found",
-    422 => "Unprocessable Entity",
-    429 => "Too Many Requests",
-    500 => "Internal Server Error",
-    502 => "Bad Gateway",
-    503 => "Service Unavailable",
-    504 => "Gateway Timeout"
+    200 => 'OK',
+    201 => 'Created',
+    204 => 'No Content',
+    301 => 'Moved Permanently',
+    302 => 'Found (Redirect)',
+    304 => 'Not Modified',
+    400 => 'Bad Request',
+    401 => 'Unauthorized',
+    403 => 'Forbidden',
+    404 => 'Not Found',
+    422 => 'Unprocessable Entity',
+    429 => 'Too Many Requests',
+    500 => 'Internal Server Error',
+    502 => 'Bad Gateway',
+    503 => 'Service Unavailable',
+    504 => 'Gateway Timeout'
   }.freeze
 
   # Strip HTML tags and normalize whitespace
@@ -41,8 +43,8 @@ module WebHelpers
   # @return [String] Plain text content
   def self.strip_html_and_normalize(content)
     HTML_STRIP_PATTERNS.reduce(content) { |text, pattern| text.gsub(pattern, ' ') }
-      .gsub(/\s+/, ' ')
-      .strip
+                       .gsub(/\s+/, ' ')
+                       .strip
   end
 
   # Truncate content with ellipsis if needed
@@ -57,7 +59,7 @@ module WebHelpers
   # @param status [Integer] HTTP status code
   # @return [String] Status description
   def self.status_description(status)
-    HTTP_STATUS_CODES.fetch(status, "Unknown")
+    HTTP_STATUS_CODES.fetch(status, 'Unknown')
   end
 
   # Parse JSON safely
@@ -74,30 +76,30 @@ module WebHelpers
   # @return [String] Query string
   def self.build_query_string(params)
     return '' if params.nil? || params.empty?
-    '?' + URI.encode_www_form(params)
+
+    "?#{URI.encode_www_form(params)}"
   end
 end
 
+tool 'web_search' do
+  description 'Search the web using DuckDuckGo and return results'
 
-tool "web_search" do
-  description "Search the web using DuckDuckGo and return results"
-
-  parameter "query" do
+  parameter 'query' do
     type :string
     required true
-    description "The search query"
+    description 'The search query'
   end
 
-  parameter "max_results" do
+  parameter 'max_results' do
     type :number
     required false
-    description "Maximum number of results to return (default: 5)"
+    description 'Maximum number of results to return (default: 5)'
     default 5
   end
 
   execute do |params|
-    query = params["query"]
-    max_results = (params["max_results"] || 5).to_i
+    query = params['query']
+    max_results = (params['max_results'] || 5).to_i
 
     # URL encode the query
     encoded_query = URI.encode_www_form_component(query)
@@ -108,9 +110,7 @@ tool "web_search" do
     # Fetch results using SDK HTTP client
     response = LanguageOperator::Dsl::HTTP.get(url, headers: { 'User-Agent' => 'Mozilla/5.0' }, follow_redirects: true)
 
-    unless response[:success]
-      next "Error: Failed to fetch search results - #{response[:error] || response[:status]}"
-    end
+    next "Error: Failed to fetch search results - #{response[:error] || response[:status]}" unless response[:success]
 
     html = response[:body]
 
@@ -118,11 +118,11 @@ tool "web_search" do
     results = []
 
     # Extract result blocks using simple pattern matching
-    html.scan(/<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>([^<]+)<\/a>/i).each_with_index do |(href, title), index|
+    html.scan(%r{<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"[^>]*>([^<]+)</a>}i).each_with_index do |(href, title), index|
       break if index >= max_results
 
       # Clean up the URL (DuckDuckGo redirects)
-      clean_url = href.gsub(/^\/\/duckduckgo\.com\/l\/\?.*uddg=/, '')
+      clean_url = href.gsub(%r{^//duckduckgo\.com/l/\?.*uddg=}, '')
       clean_url = URI.decode_www_form_component(clean_url) if clean_url.include?('%')
 
       results << "#{index + 1}. #{title.strip}\n   URL: #{clean_url}"
@@ -136,25 +136,25 @@ tool "web_search" do
   end
 end
 
-tool "web_fetch" do
-  description "Fetch and extract text content from a URL"
+tool 'web_fetch' do
+  description 'Fetch and extract text content from a URL'
 
-  parameter "url" do
+  parameter 'url' do
     type :string
     required true
-    description "The URL to fetch"
+    description 'The URL to fetch'
   end
 
-  parameter "html" do
+  parameter 'html' do
     type :boolean
     required false
-    description "Return raw HTML instead of text (default: false)"
+    description 'Return raw HTML instead of text (default: false)'
     default false
   end
 
   execute do |params|
-    url = params["url"]
-    return_html = params["html"] || false
+    url = params['url']
+    return_html = params['html'] || false
 
     # Validate URL
     error = LanguageOperator::Validators.http_url(url)
@@ -163,9 +163,7 @@ tool "web_fetch" do
     # Fetch the URL using SDK HTTP client
     response = LanguageOperator::Dsl::HTTP.get(url, headers: { 'User-Agent' => 'Mozilla/5.0' }, follow_redirects: true)
 
-    unless response[:success]
-      next "Error: Failed to fetch URL: #{url} - #{response[:error] || response[:status]}"
-    end
+    next "Error: Failed to fetch URL: #{url} - #{response[:error] || response[:status]}" unless response[:success]
 
     content = response[:body]
 
@@ -185,17 +183,17 @@ tool "web_fetch" do
   end
 end
 
-tool "web_headers" do
-  description "Fetch HTTP headers from a URL"
+tool 'web_headers' do
+  description 'Fetch HTTP headers from a URL'
 
-  parameter "url" do
+  parameter 'url' do
     type :string
     required true
-    description "The URL to check"
+    description 'The URL to check'
   end
 
   execute do |params|
-    url = params["url"]
+    url = params['url']
 
     # Validate URL
     error = LanguageOperator::Validators.http_url(url)
@@ -213,17 +211,17 @@ tool "web_headers" do
   end
 end
 
-tool "web_status" do
-  description "Check the HTTP status code of a URL"
+tool 'web_status' do
+  description 'Check the HTTP status code of a URL'
 
-  parameter "url" do
+  parameter 'url' do
     type :string
     required true
-    description "The URL to check"
+    description 'The URL to check'
   end
 
   execute do |params|
-    url = params["url"]
+    url = params['url']
 
     # Validate URL
     error = LanguageOperator::Validators.http_url(url)
@@ -239,67 +237,67 @@ tool "web_status" do
   end
 end
 
-tool "web_request" do
-  description "Make HTTP requests to APIs with full control over method, headers, body, and retries"
+tool 'web_request' do
+  description 'Make HTTP requests to APIs with full control over method, headers, body, and retries'
 
-  parameter "url" do
+  parameter 'url' do
     type :string
     required true
-    description "The URL to request"
+    description 'The URL to request'
   end
 
-  parameter "method" do
+  parameter 'method' do
     type :string
     required false
-    description "HTTP method (GET, POST, PUT, DELETE, HEAD) - default: GET"
-    default "GET"
+    description 'HTTP method (GET, POST, PUT, DELETE, HEAD) - default: GET'
+    default 'GET'
   end
 
-  parameter "headers" do
+  parameter 'headers' do
     type :string
     required false
-    description "JSON object of headers (e.g., {\"Authorization\": \"Bearer token\", \"Content-Type\": \"application/json\"})"
+    description 'JSON object of headers (e.g., {"Authorization": "Bearer token", "Content-Type": "application/json"})'
   end
 
-  parameter "body" do
+  parameter 'body' do
     type :string
     required false
-    description "Request body (for POST, PUT)"
+    description 'Request body (for POST, PUT)'
   end
 
-  parameter "query_params" do
+  parameter 'query_params' do
     type :string
     required false
-    description "JSON object of query parameters (e.g., {\"key\": \"value\", \"limit\": \"10\"})"
+    description 'JSON object of query parameters (e.g., {"key": "value", "limit": "10"})'
   end
 
-  parameter "timeout" do
+  parameter 'timeout' do
     type :number
     required false
-    description "Request timeout in seconds (default: 30)"
+    description 'Request timeout in seconds (default: 30)'
     default 30
   end
 
-  parameter "max_retries" do
+  parameter 'max_retries' do
     type :number
     required false
-    description "Maximum number of retries for transient failures (default: 3)"
+    description 'Maximum number of retries for transient failures (default: 3)'
     default 3
   end
 
-  parameter "follow_redirects" do
+  parameter 'follow_redirects' do
     type :boolean
     required false
-    description "Follow HTTP redirects (default: true)"
+    description 'Follow HTTP redirects (default: true)'
     default true
   end
 
   execute do |params|
-    url = params["url"]
-    method = (params["method"] || "GET").upcase
-    timeout = params["timeout"] || 30
-    max_retries = params["max_retries"] || 3
-    follow_redirects = params.key?("follow_redirects") ? params["follow_redirects"] : true
+    url = params['url']
+    method = (params['method'] || 'GET').upcase
+    timeout = params['timeout'] || 30
+    max_retries = params['max_retries'] || 3
+    follow_redirects = params.key?('follow_redirects') ? params['follow_redirects'] : true
 
     # Validate URL
     error = LanguageOperator::Validators.http_url(url)
@@ -307,31 +305,27 @@ tool "web_request" do
 
     # Validate method
     valid_methods = %w[GET POST PUT DELETE HEAD]
-    unless valid_methods.include?(method)
-      next LanguageOperator::Validators.one_of(method, valid_methods, 'HTTP method')
-    end
+    next LanguageOperator::Validators.one_of(method, valid_methods, 'HTTP method') unless valid_methods.include?(method)
 
     # Parse headers
     headers = {}
-    if params["headers"]
-      parsed = WebHelpers.parse_json(params["headers"])
-      if parsed.nil?
-        next LanguageOperator::Errors.invalid_json('headers')
-      end
+    if params['headers']
+      parsed = WebHelpers.parse_json(params['headers'])
+      next LanguageOperator::Errors.invalid_json('headers') if parsed.nil?
+
       headers = parsed
     end
 
     # Parse query params and append to URL
-    if params["query_params"]
-      parsed = WebHelpers.parse_json(params["query_params"])
-      if parsed.nil?
-        next LanguageOperator::Errors.invalid_json('query_params')
-      end
+    if params['query_params']
+      parsed = WebHelpers.parse_json(params['query_params'])
+      next LanguageOperator::Errors.invalid_json('query_params') if parsed.nil?
+
       url += WebHelpers.build_query_string(parsed)
     end
 
     # Get request body
-    body = params["body"]
+    body = params['body']
 
     # Execute request with retry logic
     response = nil
@@ -340,15 +334,16 @@ tool "web_request" do
 
     while attempt <= max_retries
       response = case method
-                 when "GET"
-                   LanguageOperator::Dsl::HTTP.get(url, headers: headers, timeout: timeout, follow_redirects: follow_redirects)
-                 when "POST"
+                 when 'GET'
+                   LanguageOperator::Dsl::HTTP.get(url, headers: headers, timeout: timeout,
+                                                        follow_redirects: follow_redirects)
+                 when 'POST'
                    LanguageOperator::Dsl::HTTP.post(url, body: body, headers: headers, timeout: timeout)
-                 when "PUT"
+                 when 'PUT'
                    LanguageOperator::Dsl::HTTP.put(url, body: body, headers: headers, timeout: timeout)
-                 when "DELETE"
+                 when 'DELETE'
                    LanguageOperator::Dsl::HTTP.delete(url, headers: headers, timeout: timeout)
-                 when "HEAD"
+                 when 'HEAD'
                    LanguageOperator::Dsl::HTTP.head(url, headers: headers, timeout: timeout)
                  end
 
@@ -376,13 +371,9 @@ tool "web_request" do
     end
 
     # Handle errors
-    if last_error
-      next "Error: Request failed after #{attempt + 1} attempts - #{last_error}"
-    end
+    next "Error: Request failed after #{attempt + 1} attempts - #{last_error}" if last_error
 
-    unless response
-      next "Error: No response received"
-    end
+    next 'Error: No response received' unless response
 
     # Format response
     status = response[:status] || 0
@@ -390,66 +381,66 @@ tool "web_request" do
     result = []
     result << "HTTP #{method} #{url}"
     result << "Status: #{status} #{status_text}"
-    result << ""
+    result << ''
 
     if response[:headers] && !response[:headers].empty?
-      result << "Headers:"
+      result << 'Headers:'
       response[:headers].each do |k, v|
         result << "  #{k}: #{Array(v).join(', ')}"
       end
-      result << ""
+      result << ''
     end
 
     if response[:body] && !response[:body].empty?
       body_preview = response[:body]
       # Try to pretty-print JSON
-      if headers.dig("Content-Type")&.include?("json") || response[:headers]&.dig("content-type")&.to_s&.include?("json")
+      if headers['Content-Type']&.include?('json') || response[:headers]&.dig('content-type')&.to_s&.include?('json')
         parsed = WebHelpers.parse_json(body_preview)
         body_preview = JSON.pretty_generate(parsed) if parsed
       end
 
-      result << "Body:"
+      result << 'Body:'
       result << WebHelpers.truncate_content(body_preview, 5000)
     else
-      result << "Body: (empty)"
+      result << 'Body: (empty)'
     end
 
     result.join("\n")
   end
 end
 
-tool "web_post" do
-  description "Simplified POST request for JSON APIs"
+tool 'web_post' do
+  description 'Simplified POST request for JSON APIs'
 
-  parameter "url" do
+  parameter 'url' do
     type :string
     required true
-    description "The URL to POST to"
+    description 'The URL to POST to'
   end
 
-  parameter "data" do
+  parameter 'data' do
     type :string
     required true
-    description "JSON object to send as request body"
+    description 'JSON object to send as request body'
   end
 
-  parameter "headers" do
+  parameter 'headers' do
     type :string
     required false
-    description "Additional headers as JSON object (Content-Type: application/json is set automatically)"
+    description 'Additional headers as JSON object (Content-Type: application/json is set automatically)'
   end
 
-  parameter "timeout" do
+  parameter 'timeout' do
     type :number
     required false
-    description "Request timeout in seconds (default: 30)"
+    description 'Request timeout in seconds (default: 30)'
     default 30
   end
 
   execute do |params|
-    url = params["url"]
-    data = params["data"]
-    timeout = params["timeout"] || 30
+    url = params['url']
+    data = params['data']
+    timeout = params['timeout'] || 30
 
     # Validate URL
     error = LanguageOperator::Validators.http_url(url)
@@ -457,27 +448,22 @@ tool "web_post" do
 
     # Parse and validate data JSON
     parsed_data = WebHelpers.parse_json(data)
-    if parsed_data.nil?
-      next LanguageOperator::Errors.invalid_json('data')
-    end
+    next LanguageOperator::Errors.invalid_json('data') if parsed_data.nil?
 
     # Build headers with JSON content type
-    headers = { "Content-Type" => "application/json" }
+    headers = { 'Content-Type' => 'application/json' }
 
-    if params["headers"]
-      custom_headers = WebHelpers.parse_json(params["headers"])
-      if custom_headers.nil?
-        next LanguageOperator::Errors.invalid_json('headers')
-      end
+    if params['headers']
+      custom_headers = WebHelpers.parse_json(params['headers'])
+      next LanguageOperator::Errors.invalid_json('headers') if custom_headers.nil?
+
       headers.merge!(custom_headers)
     end
 
     # Make POST request
     response = LanguageOperator::Dsl::HTTP.post(url, body: data, headers: headers, timeout: timeout)
 
-    unless response[:success]
-      next "Error: POST failed - #{response[:error] || "HTTP #{response[:status]}"}"
-    end
+    next "Error: POST failed - #{response[:error] || "HTTP #{response[:status]}"}" unless response[:success]
 
     status = response[:status] || 0
     status_text = WebHelpers.status_description(status)
@@ -485,48 +471,48 @@ tool "web_post" do
     result = []
     result << "POST #{url}"
     result << "Status: #{status} #{status_text}"
-    result << ""
+    result << ''
 
     if response[:body] && !response[:body].empty?
       body_preview = response[:body]
       parsed = WebHelpers.parse_json(body_preview)
       body_preview = JSON.pretty_generate(parsed) if parsed
 
-      result << "Response:"
+      result << 'Response:'
       result << WebHelpers.truncate_content(body_preview, 5000)
     else
-      result << "Response: (empty)"
+      result << 'Response: (empty)'
     end
 
     result.join("\n")
   end
 end
 
-tool "web_parse" do
-  description "Parse and extract data from HTTP response body (JSON, XML, or text)"
+tool 'web_parse' do
+  description 'Parse and extract data from HTTP response body (JSON, XML, or text)'
 
-  parameter "url" do
+  parameter 'url' do
     type :string
     required true
-    description "The URL to fetch and parse"
+    description 'The URL to fetch and parse'
   end
 
-  parameter "format" do
+  parameter 'format' do
     type :string
     required false
-    description "Expected format: json, xml, or text (auto-detected if not specified)"
+    description 'Expected format: json, xml, or text (auto-detected if not specified)'
   end
 
-  parameter "json_path" do
+  parameter 'json_path' do
     type :string
     required false
     description "JSON path to extract (e.g., 'data.items' for nested field)"
   end
 
   execute do |params|
-    url = params["url"]
-    format = params["format"]
-    json_path = params["json_path"]
+    url = params['url']
+    format = params['format']
+    json_path = params['json_path']
 
     # Validate URL
     error = LanguageOperator::Validators.http_url(url)
@@ -535,34 +521,28 @@ tool "web_parse" do
     # Fetch the URL
     response = LanguageOperator::Dsl::HTTP.get(url, follow_redirects: true)
 
-    unless response[:success]
-      next "Error: Failed to fetch URL - #{response[:error] || "HTTP #{response[:status]}"}"
-    end
+    next "Error: Failed to fetch URL - #{response[:error] || "HTTP #{response[:status]}"}" unless response[:success]
 
     body = response[:body]
-    if body.nil? || body.empty?
-      next "Error: Empty response body"
-    end
+    next 'Error: Empty response body' if body.nil? || body.empty?
 
     # Auto-detect format if not specified
     if format.nil?
-      content_type = response[:headers]&.dig("content-type")&.to_s || ""
-      format = if content_type.include?("json")
-                 "json"
-               elsif content_type.include?("xml")
-                 "xml"
+      content_type = response[:headers]&.dig('content-type').to_s
+      format = if content_type.include?('json')
+                 'json'
+               elsif content_type.include?('xml')
+                 'xml'
                else
-                 "text"
+                 'text'
                end
     end
 
     # Parse based on format
     case format.downcase
-    when "json"
+    when 'json'
       parsed = WebHelpers.parse_json(body)
-      if parsed.nil?
-        next "Error: Invalid JSON in response body"
-      end
+      next 'Error: Invalid JSON in response body' if parsed.nil?
 
       # Extract JSON path if specified
       if json_path
@@ -580,18 +560,16 @@ tool "web_parse" do
           end
         end
 
-        if result.nil?
-          next "Error: JSON path '#{json_path}' not found"
-        end
+        next "Error: JSON path '#{json_path}' not found" if result.nil?
 
         JSON.pretty_generate(result)
       else
         JSON.pretty_generate(parsed)
       end
-    when "xml"
+    when 'xml'
       # Basic XML display (no parsing library available)
       WebHelpers.truncate_content(body, 5000)
-    when "text"
+    when 'text'
       text = WebHelpers.strip_html_and_normalize(body)
       WebHelpers.truncate_content(text, 5000)
     else

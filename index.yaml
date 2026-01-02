@@ -1,6 +1,6 @@
 ---
 version: '1.0'
-generated: '2025-11-18T19:40:39Z'
+generated: '2026-01-02T03:01:59Z'
 tools:
   cron:
     name: cron
@@ -155,7 +155,8 @@ tools:
   web:
     name: web
     displayName: Web Tool
-    description: Search the web and fetch web pages using DuckDuckGo
+    description: Web search via DuckDuckGo, HTTP client with full method support,
+      content fetching and parsing, status checking, and header inspection
     image: ghcr.io/language-operator/web-tool:latest
     deploymentMode: service
     port: 80
