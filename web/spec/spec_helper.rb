@@ -17,14 +17,52 @@ require 'bundler/setup'
 require 'language_operator'
 require 'webmock/rspec'
 
-# Disable real HTTP connections - be more strict in CI
-WebMock.disable_net_connect!(allow_localhost: false, allow: [])
+# Configure WebMock to work with LanguageOperator::Dsl::HTTP
+# The Language Operator DSL likely uses Net::HTTP under the hood
+WebMock.disable_net_connect!(
+  allow_localhost: false, 
+  allow: [],
+  net_http_connect_on_start: false
+)
+
+# Allow WebMock to stub all HTTP adapters including LanguageOperator::Dsl::HTTP
+WebMock.enable!
+
+# Additional configuration for stricter stubbing
+WebMock::Config.instance.query_values_notation = :flat_array
 
 RSpec.configure do |config|
   # Reset WebMock before each test to ensure clean state
   config.before(:each) do
     WebMock.reset!
-    WebMock.disable_net_connect!(allow_localhost: false, allow: [])
+    WebMock.enable!
+    WebMock.disable_net_connect!(
+      allow_localhost: false, 
+      allow: [],
+      net_http_connect_on_start: false
+    )
+  end
+
+  # Ensure WebMock is properly cleaned up after each test
+  config.after(:each) do
+    # Check for unstubbed requests
+    WebMock.reset!
+  end
+  
+  # Add global stub checking
+  config.around(:each) do |example|
+    # Store original ENV
+    original_env = ENV.to_h
+    
+    # Set ENV to ensure no real network calls
+    ENV['WEBMOCK_DEBUG'] = 'true' if ENV['CI']
+    
+    begin
+      example.run
+    ensure
+      # Restore original ENV
+      ENV.replace(original_env)
+    end
   end
 
   config.expect_with :rspec do |expectations|
