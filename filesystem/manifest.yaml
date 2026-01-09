@@ -10,3 +10,7 @@ type: mcp
 volumes:
   - name: workspace
     mountPath: /workspace
+
+# Optional aliases for this tool
+aliases:
+  - fs
