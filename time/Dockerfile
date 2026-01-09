@@ -3,5 +3,6 @@ FROM mcp/time:latest
 # Expose port 80 for Language Operator compatibility
 EXPOSE 80
 
-# Override entrypoint to run on port 80 with HTTP transport
-ENTRYPOINT ["mcp-server-time", "--transport", "http", "--port", "80"]
+# The time server only supports stdio transport, not HTTP
+# Use default stdio transport - Language Operator should handle protocol bridging  
+ENTRYPOINT ["mcp-server-time"]
