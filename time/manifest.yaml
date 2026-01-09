@@ -1,5 +1,5 @@
 name: time
-displayName: Time and Timezone Tool
+displayName: Time
 description: Time and timezone conversion capabilities using IANA timezone names with automatic system timezone detection
 image: ghcr.io/language-operator/time-tool:latest
 deploymentMode: service

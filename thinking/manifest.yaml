@@ -1,5 +1,5 @@
 name: thinking
-displayName: Sequential Thinking Tool
+displayName: Sequential Thinking
 description: Dynamic and reflective problem-solving through structured thinking process - analyze complex problems step-by-step with revision capabilities
 image: ghcr.io/language-operator/thinking-tool:latest
 deploymentMode: service

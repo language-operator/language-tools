@@ -1,5 +1,5 @@
 name: email
-displayName: Email Tool
+displayName: Email
 description: Send and receive emails via SMTP/IMAP
 image: ghcr.io/language-operator/email-tool:latest
 deploymentMode: service

@@ -1,5 +1,5 @@
 name: k8s
-displayName: Kubernetes Tool
+displayName: Kubernetes
 description: Native Kubernetes operations - manage resources, pods, logs, and CRDs
 image: ghcr.io/language-operator/k8s-tool:latest
 deploymentMode: service

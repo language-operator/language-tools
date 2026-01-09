@@ -1,10 +1,10 @@
 ---
 version: '1.0'
-generated: '2026-01-09T04:29:32Z'
+generated: '2026-01-09T04:35:42Z'
 tools:
   email:
     name: email
-    displayName: Email Tool
+    displayName: Email
     description: Send and receive emails via SMTP/IMAP
     image: ghcr.io/language-operator/email-tool:latest
     deploymentMode: service
@@ -24,7 +24,7 @@ tools:
         protocol: TCP
   filesystem:
     name: filesystem
-    displayName: Filesystem Tool
+    displayName: Filesystem
     description: Official MCP filesystem server with advanced file operations - edit_file
       with diffs, directory trees, media files, multiple file reads, and dynamic access
       control
@@ -37,7 +37,7 @@ tools:
       mountPath: "/workspace"
   k8s:
     name: k8s
-    displayName: Kubernetes Tool
+    displayName: Kubernetes
     description: Native Kubernetes operations - manage resources, pods, logs, and
       CRDs
     image: ghcr.io/language-operator/k8s-tool:latest
@@ -95,7 +95,7 @@ tools:
         protocol: TCP
   memory:
     name: memory
-    displayName: Knowledge Graph Memory Tool
+    displayName: Memory
     description: Persistent memory using knowledge graph with entities, relations,
       and observations - enables agents to remember and recall information across
       conversations
@@ -108,7 +108,7 @@ tools:
       mountPath: "/workspace"
   shell:
     name: shell
-    displayName: Shell Command Tool
+    displayName: Shell
     description: Secure shell command execution with directory restrictions and timeout
       controls - enables agents to run bash commands safely
     image: ghcr.io/language-operator/shell-tool:latest
@@ -120,7 +120,7 @@ tools:
       mountPath: "/workspace"
   thinking:
     name: thinking
-    displayName: Sequential Thinking Tool
+    displayName: Sequential Thinking
     description: Dynamic and reflective problem-solving through structured thinking
       process - analyze complex problems step-by-step with revision capabilities
     image: ghcr.io/language-operator/thinking-tool:latest
@@ -129,7 +129,7 @@ tools:
     type: mcp
   time:
     name: time
-    displayName: Time and Timezone Tool
+    displayName: Time
     description: Time and timezone conversion capabilities using IANA timezone names
       with automatic system timezone detection
     image: ghcr.io/language-operator/time-tool:latest
@@ -138,7 +138,7 @@ tools:
     type: mcp
   web:
     name: web
-    displayName: Web Tool
+    displayName: Web
     description: Web search via DuckDuckGo, HTTP client with full method support,
       content fetching and parsing, status checking, and header inspection
     image: ghcr.io/language-operator/web-tool:latest

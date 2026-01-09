@@ -1,5 +1,5 @@
 name: shell
-displayName: Shell Command Tool
+displayName: Shell
 description: Secure shell command execution with directory restrictions and timeout controls - enables agents to run bash commands safely
 image: ghcr.io/language-operator/shell-tool:latest
 deploymentMode: sidecar

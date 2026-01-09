@@ -1,5 +1,5 @@
 name: web
-displayName: Web Tool
+displayName: Web
 description: Web search via DuckDuckGo, HTTP client with full method support, content fetching and parsing, status checking, and header inspection
 image: ghcr.io/language-operator/web-tool:latest
 deploymentMode: service
