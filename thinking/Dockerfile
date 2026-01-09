@@ -1,5 +1,9 @@
 FROM mcp/sequentialthinking:latest
 
+# Install Python for HTTP bridge
+RUN apt-get update && apt-get install -y python3 && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copy HTTP bridge (uses Python standard library only)
 COPY http-bridge.py /app/http-bridge.py
 RUN chmod +x /app/http-bridge.py

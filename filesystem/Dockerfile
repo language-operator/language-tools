@@ -1,9 +1,15 @@
-# Use the official MCP filesystem server image
 FROM mcp/filesystem:latest
 
-# The official image already has the MCP server built and configured
-# We just need to ensure it runs with the correct workspace directory argument
-# The original entrypoint is: ["node", "/app/dist/index.js"]
-# We override it to specify /workspace as the allowed directory
+# Install Python for HTTP bridge
+RUN apt-get update && apt-get install -y python3 && \
+    rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["node", "/app/dist/index.js", "/workspace"]
+# Copy HTTP bridge (uses Python standard library only)
+COPY http-bridge.py /app/http-bridge.py
+RUN chmod +x /app/http-bridge.py
+
+# Expose port 80 for Language Operator compatibility
+EXPOSE 80
+
+# Run HTTP bridge that wraps the stdio MCP server
+ENTRYPOINT ["python3", "/app/http-bridge.py"]
