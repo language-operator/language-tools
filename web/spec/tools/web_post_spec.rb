@@ -14,7 +14,7 @@ RSpec.describe 'web_post tool' do
 
   describe 'basic POST functionality' do
     it 'makes POST requests with JSON data' do
-      stub_request(:post, 'https://api.example.com/users')
+      stub_request(:post, 'https://example.com/users')
         .with(
           body: '{"name":"Alice","email":"alice@example.com"}',
           headers: { 'Content-Type' => 'application/json' }
@@ -27,24 +27,24 @@ RSpec.describe 'web_post tool' do
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/users',
+        'url' => 'https://example.com/users',
         'data' => '{"name":"Alice","email":"alice@example.com"}'
       )
 
-      expect(result).to include('POST https://api.example.com/users')
+      expect(result).to include('POST https://example.com/users')
       expect(result).to include('Status: 201 Created')
       expect(result).to include('"id"')
       expect(result).to include('"Alice"')
     end
 
     it 'automatically sets Content-Type to application/json' do
-      stub_request(:post, 'https://api.example.com/data')
+      stub_request(:post, 'https://example.com/data')
         .with(headers: { 'Content-Type' => 'application/json' })
         .to_return(status: 200, body: '{"success":true}')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/data',
+        'url' => 'https://example.com/data',
         'data' => '{}'
       )
 
@@ -52,7 +52,7 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'pretty-prints JSON response' do
-      stub_request(:post, 'https://api.example.com/test')
+      stub_request(:post, 'https://example.com/test')
         .to_return(
           status: 200,
           body: '{"users":[{"id":1,"name":"Bob"}],"count":1}',
@@ -61,7 +61,7 @@ RSpec.describe 'web_post tool' do
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'data' => '{}'
       )
 
@@ -73,7 +73,7 @@ RSpec.describe 'web_post tool' do
 
   describe 'custom headers' do
     it 'merges custom headers with default Content-Type' do
-      stub_request(:post, 'https://api.example.com/protected')
+      stub_request(:post, 'https://example.com/protected')
         .with(
           headers: {
             'Content-Type' => 'application/json',
@@ -84,7 +84,7 @@ RSpec.describe 'web_post tool' do
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/protected',
+        'url' => 'https://example.com/protected',
         'data' => '{}',
         'headers' => '{"Authorization":"Bearer token123"}'
       )
@@ -93,7 +93,7 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'allows adding extra headers while keeping Content-Type' do
-      stub_request(:post, 'https://api.example.com/data')
+      stub_request(:post, 'https://example.com/data')
         .with(
           headers: {
             'Content-Type' => 'application/json',
@@ -105,7 +105,7 @@ RSpec.describe 'web_post tool' do
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/data',
+        'url' => 'https://example.com/data',
         'data' => '{"test":true}',
         'headers' => '{"X-API-Key":"secret123"}'
       )
@@ -116,7 +116,7 @@ RSpec.describe 'web_post tool' do
     it 'returns error for invalid JSON in headers' do
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'data' => '{}',
         'headers' => 'not-json'
       )
@@ -129,7 +129,7 @@ RSpec.describe 'web_post tool' do
     it 'validates data parameter is valid JSON' do
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'data' => 'not-valid-json'
       )
 
@@ -137,13 +137,13 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'accepts empty JSON object' do
-      stub_request(:post, 'https://api.example.com/test')
+      stub_request(:post, 'https://example.com/test')
         .with(body: '{}')
         .to_return(status: 200, body: '{"ok":true}')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'data' => '{}'
       )
 
@@ -151,13 +151,13 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'accepts JSON arrays' do
-      stub_request(:post, 'https://api.example.com/batch')
+      stub_request(:post, 'https://example.com/batch')
         .with(body: '[{"id":1},{"id":2}]')
         .to_return(status: 200, body: '{"processed":2}')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/batch',
+        'url' => 'https://example.com/batch',
         'data' => '[{"id":1},{"id":2}]'
       )
 
@@ -167,7 +167,7 @@ RSpec.describe 'web_post tool' do
 
   describe 'error handling' do
     it 'handles 400 errors' do
-      stub_request(:post, 'https://api.example.com/users')
+      stub_request(:post, 'https://example.com/users')
         .to_return(
           status: 400,
           body: '{"error":"Invalid input"}'
@@ -175,7 +175,7 @@ RSpec.describe 'web_post tool' do
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/users',
+        'url' => 'https://example.com/users',
         'data' => '{"invalid":"data"}'
       )
 
@@ -183,12 +183,12 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'handles 500 errors' do
-      stub_request(:post, 'https://api.example.com/error')
+      stub_request(:post, 'https://example.com/error')
         .to_return(status: 500, body: 'Internal Server Error')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/error',
+        'url' => 'https://example.com/error',
         'data' => '{}'
       )
 
@@ -196,12 +196,12 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'handles network timeouts' do
-      stub_request(:post, 'https://api.example.com/slow')
+      stub_request(:post, 'https://example.com/slow')
         .to_timeout
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/slow',
+        'url' => 'https://example.com/slow',
         'data' => '{}'
       )
 
@@ -211,12 +211,12 @@ RSpec.describe 'web_post tool' do
 
   describe 'empty response handling' do
     it 'handles empty response body' do
-      stub_request(:post, 'https://api.example.com/delete')
+      stub_request(:post, 'https://example.com/delete')
         .to_return(status: 204, body: '')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/delete',
+        'url' => 'https://example.com/delete',
         'data' => '{}'
       )
 
@@ -237,12 +237,12 @@ RSpec.describe 'web_post tool' do
     end
 
     it 'accepts http:// URLs' do
-      stub_request(:post, 'http://api.example.com/test')
+      stub_request(:post, 'http://example.com/test')
         .to_return(status: 200, body: '{"ok":true}')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'http://api.example.com/test',
+        'url' => 'http://example.com/test',
         'data' => '{}'
       )
 
@@ -252,12 +252,12 @@ RSpec.describe 'web_post tool' do
 
   describe 'timeout configuration' do
     it 'accepts custom timeout parameter' do
-      stub_request(:post, 'https://api.example.com/slow')
+      stub_request(:post, 'https://example.com/slow')
         .to_return(status: 200, body: '{"ok":true}')
 
       tool = registry.get('web_post')
       result = tool.call(
-        'url' => 'https://api.example.com/slow',
+        'url' => 'https://example.com/slow',
         'data' => '{}',
         'timeout' => 60
       )

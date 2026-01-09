@@ -14,42 +14,42 @@ RSpec.describe 'web_request tool' do
 
   describe 'HTTP methods' do
     it 'makes GET requests' do
-      stub_request(:get, 'https://api.example.com/users')
+      stub_request(:get, 'https://example.com/users')
         .to_return(status: 200, body: '{"users":[]}', headers: { 'Content-Type' => 'application/json' })
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/users', 'method' => 'GET')
+      result = tool.call('url' => 'https://example.com/users', 'method' => 'GET')
 
-      expect(result).to include('HTTP GET https://api.example.com/users')
+      expect(result).to include('HTTP GET https://example.com/users')
       expect(result).to include('Status: 200 OK')
       expect(result).to include('"users"')
     end
 
     it 'makes POST requests' do
-      stub_request(:post, 'https://api.example.com/users')
+      stub_request(:post, 'https://example.com/users')
         .with(body: '{"name":"John"}')
         .to_return(status: 201, body: '{"id":1,"name":"John"}', headers: { 'Content-Type' => 'application/json' })
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/users',
+        'url' => 'https://example.com/users',
         'method' => 'POST',
         'body' => '{"name":"John"}'
       )
 
-      expect(result).to include('HTTP POST https://api.example.com/users')
+      expect(result).to include('HTTP POST https://example.com/users')
       expect(result).to include('Status: 201 Created')
       expect(result).to include('"id"')
     end
 
     it 'makes PUT requests' do
-      stub_request(:put, 'https://api.example.com/users/1')
+      stub_request(:put, 'https://example.com/users/1')
         .with(body: '{"name":"Jane"}')
         .to_return(status: 200, body: '{"id":1,"name":"Jane"}')
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/users/1',
+        'url' => 'https://example.com/users/1',
         'method' => 'PUT',
         'body' => '{"name":"Jane"}'
       )
@@ -59,12 +59,12 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'makes DELETE requests' do
-      stub_request(:delete, 'https://api.example.com/users/1')
+      stub_request(:delete, 'https://example.com/users/1')
         .to_return(status: 204, body: '')
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/users/1',
+        'url' => 'https://example.com/users/1',
         'method' => 'DELETE'
       )
 
@@ -74,12 +74,12 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'makes HEAD requests' do
-      stub_request(:head, 'https://api.example.com/users')
+      stub_request(:head, 'https://example.com/users')
         .to_return(status: 200, headers: { 'Content-Type' => 'application/json' })
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/users',
+        'url' => 'https://example.com/users',
         'method' => 'HEAD'
       )
 
@@ -88,18 +88,18 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'defaults to GET when method not specified' do
-      stub_request(:get, 'https://api.example.com/test')
+      stub_request(:get, 'https://example.com/test')
         .to_return(status: 200, body: 'test')
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/test')
+      result = tool.call('url' => 'https://example.com/test')
 
       expect(result).to include('HTTP GET')
     end
 
     it 'rejects invalid HTTP methods' do
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/test', 'method' => 'INVALID')
+      result = tool.call('url' => 'https://example.com/test', 'method' => 'INVALID')
 
       expect(result).to include('Error: Invalid HTTP method')
     end
@@ -107,13 +107,13 @@ RSpec.describe 'web_request tool' do
 
   describe 'custom headers' do
     it 'sends custom headers' do
-      stub_request(:get, 'https://api.example.com/protected')
+      stub_request(:get, 'https://example.com/protected')
         .with(headers: { 'Authorization' => 'Bearer token123' })
         .to_return(status: 200, body: '{"data":"secret"}')
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/protected',
+        'url' => 'https://example.com/protected',
         'headers' => '{"Authorization":"Bearer token123"}'
       )
 
@@ -122,7 +122,7 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'sends multiple custom headers' do
-      stub_request(:post, 'https://api.example.com/data')
+      stub_request(:post, 'https://example.com/data')
         .with(
           headers: {
             'Authorization' => 'Bearer token123',
@@ -134,7 +134,7 @@ RSpec.describe 'web_request tool' do
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/data',
+        'url' => 'https://example.com/data',
         'method' => 'POST',
         'headers' => '{"Authorization":"Bearer token123","Content-Type":"application/json","X-Custom-Header":"value"}',
         'body' => '{}'
@@ -146,7 +146,7 @@ RSpec.describe 'web_request tool' do
     it 'returns error for invalid JSON in headers' do
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'headers' => 'not-valid-json'
       )
 
@@ -156,12 +156,12 @@ RSpec.describe 'web_request tool' do
 
   describe 'query parameters' do
     it 'appends query parameters to URL' do
-      stub_request(:get, 'https://api.example.com/search?q=test&limit=10')
+      stub_request(:get, 'https://example.com/search?q=test&limit=10')
         .to_return(status: 200, body: '{"results":[]}')
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/search',
+        'url' => 'https://example.com/search',
         'query_params' => '{"q":"test","limit":"10"}'
       )
 
@@ -171,7 +171,7 @@ RSpec.describe 'web_request tool' do
     it 'returns error for invalid JSON in query_params' do
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'query_params' => 'not-valid-json'
       )
 
@@ -181,14 +181,14 @@ RSpec.describe 'web_request tool' do
 
   describe 'retry logic' do
     it 'retries on 503 errors' do
-      stub_request(:get, 'https://api.example.com/flaky')
+      stub_request(:get, 'https://example.com/flaky')
         .to_return(status: 503).then
         .to_return(status: 503).then
         .to_return(status: 200, body: '{"success":true}')
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/flaky',
+        'url' => 'https://example.com/flaky',
         'max_retries' => 3
       )
 
@@ -197,23 +197,23 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'retries on 500 errors' do
-      stub_request(:get, 'https://api.example.com/error')
+      stub_request(:get, 'https://example.com/error')
         .to_return(status: 500).then
         .to_return(status: 200, body: 'ok')
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/error')
+      result = tool.call('url' => 'https://example.com/error')
 
       expect(result).to include('Status: 200 OK')
     end
 
     it 'stops retrying after max_retries exceeded' do
-      stub_request(:get, 'https://api.example.com/always-fails')
+      stub_request(:get, 'https://example.com/always-fails')
         .to_return(status: 503).times(5)
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/always-fails',
+        'url' => 'https://example.com/always-fails',
         'max_retries' => 2
       )
 
@@ -221,11 +221,11 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'does not retry on 404 errors' do
-      stub_request(:get, 'https://api.example.com/notfound')
+      stub_request(:get, 'https://example.com/notfound')
         .to_return(status: 404, body: 'Not Found')
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/notfound')
+      result = tool.call('url' => 'https://example.com/notfound')
 
       expect(result).to include('Status: 404 Not Found')
     end
@@ -233,7 +233,7 @@ RSpec.describe 'web_request tool' do
 
   describe 'response formatting' do
     it 'pretty-prints JSON responses' do
-      stub_request(:get, 'https://api.example.com/data')
+      stub_request(:get, 'https://example.com/data')
         .to_return(
           status: 200,
           body: '{"users":[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]}',
@@ -241,7 +241,7 @@ RSpec.describe 'web_request tool' do
         )
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/data')
+      result = tool.call('url' => 'https://example.com/data')
 
       expect(result).to include('Status: 200 OK')
       expect(result).to include('"users"')
@@ -249,7 +249,7 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'includes response headers' do
-      stub_request(:get, 'https://api.example.com/test')
+      stub_request(:get, 'https://example.com/test')
         .to_return(
           status: 200,
           body: 'test',
@@ -260,7 +260,7 @@ RSpec.describe 'web_request tool' do
         )
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/test')
+      result = tool.call('url' => 'https://example.com/test')
 
       expect(result).to include('Headers:')
       expect(result).to include('content-type')
@@ -270,23 +270,23 @@ RSpec.describe 'web_request tool' do
 
   describe 'error handling' do
     it 'handles network errors gracefully' do
-      stub_request(:get, 'https://api.example.com/timeout')
+      stub_request(:get, 'https://example.com/timeout')
         .to_timeout
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'https://api.example.com/timeout', 'max_retries' => 0)
+      result = tool.call('url' => 'https://example.com/timeout', 'max_retries' => 0)
 
       expect(result).to include('Error: Request failed')
       expect(result).to include('execution expired')
     end
 
     it 'returns error after all retries exhausted' do
-      stub_request(:get, 'https://api.example.com/always-timeout')
+      stub_request(:get, 'https://example.com/always-timeout')
         .to_timeout.times(5)
 
       tool = registry.get('web_request')
       result = tool.call(
-        'url' => 'https://api.example.com/always-timeout',
+        'url' => 'https://example.com/always-timeout',
         'max_retries' => 2
       )
 
@@ -303,11 +303,11 @@ RSpec.describe 'web_request tool' do
     end
 
     it 'accepts http:// URLs' do
-      stub_request(:get, 'http://api.example.com/test')
+      stub_request(:get, 'http://example.com/test')
         .to_return(status: 200, body: 'ok')
 
       tool = registry.get('web_request')
-      result = tool.call('url' => 'http://api.example.com/test')
+      result = tool.call('url' => 'http://example.com/test')
 
       expect(result).to include('Status: 200 OK')
     end

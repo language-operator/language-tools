@@ -14,7 +14,7 @@ RSpec.describe 'web_parse tool' do
 
   describe 'JSON parsing' do
     it 'parses and pretty-prints JSON' do
-      stub_request(:get, 'https://api.example.com/users')
+      stub_request(:get, 'https://example.com/users')
         .to_return(
           status: 200,
           body: '{"users":[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}],"count":2}',
@@ -22,7 +22,7 @@ RSpec.describe 'web_parse tool' do
         )
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/users')
+      result = tool.call('url' => 'https://example.com/users')
 
       expect(result).to include('"users"')
       expect(result).to include('"Alice"')
@@ -31,7 +31,7 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'auto-detects JSON format from Content-Type header' do
-      stub_request(:get, 'https://api.example.com/data.json')
+      stub_request(:get, 'https://example.com/data.json')
         .to_return(
           status: 200,
           body: '{"test":true}',
@@ -39,14 +39,14 @@ RSpec.describe 'web_parse tool' do
         )
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/data.json')
+      result = tool.call('url' => 'https://example.com/data.json')
 
       expect(result).to include('"test"')
       expect(result).to include('true')
     end
 
     it 'explicitly parses JSON when format is specified' do
-      stub_request(:get, 'https://api.example.com/data')
+      stub_request(:get, 'https://example.com/data')
         .to_return(
           status: 200,
           body: '{"value":123}',
@@ -55,7 +55,7 @@ RSpec.describe 'web_parse tool' do
 
       tool = registry.get('web_parse')
       result = tool.call(
-        'url' => 'https://api.example.com/data',
+        'url' => 'https://example.com/data',
         'format' => 'json'
       )
 
@@ -64,7 +64,7 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'returns error for invalid JSON' do
-      stub_request(:get, 'https://api.example.com/invalid')
+      stub_request(:get, 'https://example.com/invalid')
         .to_return(
           status: 200,
           body: 'not valid json',
@@ -72,7 +72,7 @@ RSpec.describe 'web_parse tool' do
         )
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/invalid')
+      result = tool.call('url' => 'https://example.com/invalid')
 
       expect(result).to include('Error: Invalid JSON in response body')
     end
@@ -80,7 +80,7 @@ RSpec.describe 'web_parse tool' do
 
   describe 'JSON path extraction' do
     it 'extracts nested fields using json_path' do
-      stub_request(:get, 'https://api.example.com/response')
+      stub_request(:get, 'https://example.com/response')
         .to_return(
           status: 200,
           body: '{"data":{"users":[{"id":1,"name":"Alice"}],"total":1}}',
@@ -89,7 +89,7 @@ RSpec.describe 'web_parse tool' do
 
       tool = registry.get('web_parse')
       result = tool.call(
-        'url' => 'https://api.example.com/response',
+        'url' => 'https://example.com/response',
         'json_path' => 'data.users'
       )
 
@@ -98,7 +98,7 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'extracts top-level fields' do
-      stub_request(:get, 'https://api.example.com/data')
+      stub_request(:get, 'https://example.com/data')
         .to_return(
           status: 200,
           body: '{"users":[1,2,3],"metadata":{"count":3}}',
@@ -107,7 +107,7 @@ RSpec.describe 'web_parse tool' do
 
       tool = registry.get('web_parse')
       result = tool.call(
-        'url' => 'https://api.example.com/data',
+        'url' => 'https://example.com/data',
         'json_path' => 'users'
       )
 
@@ -117,7 +117,7 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'extracts array elements by index' do
-      stub_request(:get, 'https://api.example.com/list')
+      stub_request(:get, 'https://example.com/list')
         .to_return(
           status: 200,
           body: '[{"id":1},{"id":2},{"id":3}]',
@@ -126,7 +126,7 @@ RSpec.describe 'web_parse tool' do
 
       tool = registry.get('web_parse')
       result = tool.call(
-        'url' => 'https://api.example.com/list',
+        'url' => 'https://example.com/list',
         'json_path' => '0'
       )
 
@@ -136,7 +136,7 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'returns error when json_path not found' do
-      stub_request(:get, 'https://api.example.com/data')
+      stub_request(:get, 'https://example.com/data')
         .to_return(
           status: 200,
           body: '{"users":[]}',
@@ -145,7 +145,7 @@ RSpec.describe 'web_parse tool' do
 
       tool = registry.get('web_parse')
       result = tool.call(
-        'url' => 'https://api.example.com/data',
+        'url' => 'https://example.com/data',
         'json_path' => 'nonexistent.field'
       )
 
@@ -158,7 +158,7 @@ RSpec.describe 'web_parse tool' do
     it 'returns XML content when format is xml' do
       xml_content = '<?xml version="1.0"?><root><item>test</item></root>'
 
-      stub_request(:get, 'https://api.example.com/data.xml')
+      stub_request(:get, 'https://example.com/data.xml')
         .to_return(
           status: 200,
           body: xml_content,
@@ -166,14 +166,14 @@ RSpec.describe 'web_parse tool' do
         )
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/data.xml')
+      result = tool.call('url' => 'https://example.com/data.xml')
 
       expect(result).to include('<root>')
       expect(result).to include('<item>')
     end
 
     it 'auto-detects XML from Content-Type' do
-      stub_request(:get, 'https://api.example.com/feed')
+      stub_request(:get, 'https://example.com/feed')
         .to_return(
           status: 200,
           body: '<rss><channel><title>Test</title></channel></rss>',
@@ -181,7 +181,7 @@ RSpec.describe 'web_parse tool' do
         )
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/feed')
+      result = tool.call('url' => 'https://example.com/feed')
 
       expect(result).to include('<rss>')
     end
@@ -227,32 +227,32 @@ RSpec.describe 'web_parse tool' do
 
   describe 'error handling' do
     it 'returns error for failed requests' do
-      stub_request(:get, 'https://api.example.com/error')
+      stub_request(:get, 'https://example.com/error')
         .to_return(status: 500, body: 'Server Error')
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/error')
+      result = tool.call('url' => 'https://example.com/error')
 
       expect(result).to include('Error: Failed to fetch URL')
     end
 
     it 'returns error for empty response body' do
-      stub_request(:get, 'https://api.example.com/empty')
+      stub_request(:get, 'https://example.com/empty')
         .to_return(status: 200, body: '')
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/empty')
+      result = tool.call('url' => 'https://example.com/empty')
 
       expect(result).to include('Error: Empty response body')
     end
 
     it 'returns error for unsupported format' do
-      stub_request(:get, 'https://api.example.com/test')
+      stub_request(:get, 'https://example.com/test')
         .to_return(status: 200, body: 'test')
 
       tool = registry.get('web_parse')
       result = tool.call(
-        'url' => 'https://api.example.com/test',
+        'url' => 'https://example.com/test',
         'format' => 'unsupported'
       )
 
@@ -260,11 +260,11 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'handles network errors' do
-      stub_request(:get, 'https://api.example.com/timeout')
+      stub_request(:get, 'https://example.com/timeout')
         .to_timeout
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'https://api.example.com/timeout')
+      result = tool.call('url' => 'https://example.com/timeout')
 
       expect(result).to include('Error: Failed to fetch URL')
     end
@@ -279,7 +279,7 @@ RSpec.describe 'web_parse tool' do
     end
 
     it 'accepts http:// URLs' do
-      stub_request(:get, 'http://api.example.com/data')
+      stub_request(:get, 'http://example.com/data')
         .to_return(
           status: 200,
           body: '{"test":true}',
@@ -287,7 +287,7 @@ RSpec.describe 'web_parse tool' do
         )
 
       tool = registry.get('web_parse')
-      result = tool.call('url' => 'http://api.example.com/data')
+      result = tool.call('url' => 'http://example.com/data')
 
       expect(result).to include('"test"')
     end
