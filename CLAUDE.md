@@ -16,7 +16,7 @@ make build-all
 
 # Build a single tool (note: some tools use different directory names)
 cd <tool-name> && make build
-# Available tools: web, email, cron, k8s, filesystem
+# Available tools: web, email, k8s, filesystem
 
 # Compile tool registry index from manifests
 make build
@@ -31,7 +31,7 @@ make clean
 ### Individual Tool Development
 
 ```bash
-# Navigate to any tool directory (web/, email/, cron/, k8s/, filesystem/)
+# Navigate to any tool directory (web/, email/, k8s/, filesystem/)
 cd web/
 
 # Run unit tests (must be in tool directory)
@@ -89,7 +89,7 @@ curl -X POST http://localhost:8080/mcp \
 ### Repository Structure
 
 - **Root level**: `Makefile` for building all tools, `index.yaml` (generated tool registry), `tools.mk` (shared Makefile)
-- **Tool directories**: `web/`, `email/`, `cron/`, `k8s/`, `filesystem/` - each contains a complete MCP server
+- **Tool directories**: `web/`, `email/`, `k8s/`, `filesystem/` - each contains a complete MCP server
 - **scripts/**: `compile-index.rb` - generates the unified tool registry from individual manifests
 
 ### Individual Tool Structure
@@ -142,9 +142,8 @@ end
 
 1. **web**: Web search (DuckDuckGo), HTTP client, content fetching and parsing
 2. **email**: SMTP email sending, configuration testing 
-3. **cron**: Self-scheduling, natural language cron parsing, LanguageAgent CRD management
-4. **k8s**: Full Kubernetes API access, pod operations, resource CRUD
-5. **filesystem**: Advanced file operations using official MCP filesystem server (17 tools)
+3. **k8s**: Full Kubernetes API access, pod operations, resource CRUD
+4. **filesystem**: Advanced file operations using official MCP filesystem server (17 tools)
 
 ### MCP Protocol Implementation
 
@@ -176,11 +175,6 @@ The `language-operator` Ruby gem provides:
 - Uses DuckDuckGo for search, supports full HTTP operations
 - Network egress to any HTTPS/HTTP destination
 
-### Cron Tool (`cron/`)
-- Self-scheduling capabilities, natural language parsing
-- Modifies LanguageAgent CRDs to create schedules
-- Requires RBAC access to `languageagents` resources
-
 ### Filesystem Tool (`filesystem/`)
 - Wraps official MCP filesystem server with 17 advanced tools
 - Features: edit_file with diffs, directory trees, media files, multi-file reads
@@ -209,8 +203,6 @@ Always run linting and tests before committing. The repository uses RuboCop for 
 The repository includes a pre-commit hook that automatically rebuilds `index.yaml` when `manifest.yaml` files change. This ensures the tool registry stays in sync with individual tool configurations.
 
 ## Important Notes
-
-- **Directory Structure**: The Makefile refers to a `filesystem` tool, but the actual directory is named `workspace`
 - **Dependencies**: All tools depend on the `language-operator` gem which provides the core SDK
 - **Testing**: Each tool has integration tests that verify MCP protocol compliance
 - **Documentation**: Tools support YARD documentation generation via `make doc`

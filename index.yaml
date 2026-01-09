@@ -1,36 +1,7 @@
 ---
 version: '1.0'
-generated: '2026-01-09T02:58:24Z'
+generated: '2026-01-09T03:39:19Z'
 tools:
-  cron:
-    name: cron
-    displayName: Cron Scheduler
-    description: Self-scheduling and temporal operations tool - enables agents to
-      manage execution schedules
-    image: ghcr.io/language-operator/cron-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    rbac:
-      clusterRole:
-        rules:
-        - apiGroups:
-          - langop.io
-          resources:
-          - languageagents
-          verbs:
-          - get
-          - list
-          - watch
-          - update
-          - patch
-    egress:
-    - description: Allow Kubernetes API access
-      dns:
-      - kubernetes.default.svc.cluster.local
-      ports:
-      - port: 443
-        protocol: TCP
   email:
     name: email
     displayName: Email Tool

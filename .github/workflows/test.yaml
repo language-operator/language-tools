@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         # Note: filesystem tool excluded as it's a pure Docker wrapper without Ruby tests
-        tool: [k8s, web, email, cron]
+        tool: [k8s, web, email]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
