@@ -20,6 +20,14 @@ help:
 	@echo "  web-push         - Push web tool image"
 	@echo "  filesystem-build - Build filesystem tool image"
 	@echo "  filesystem-push  - Push filesystem tool image"
+	@echo "  thinking-build   - Build thinking tool image"
+	@echo "  thinking-push    - Push thinking tool image"
+	@echo "  memory-build     - Build memory tool image"
+	@echo "  memory-push      - Push memory tool image"
+	@echo "  time-build       - Build time tool image"
+	@echo "  time-push        - Push time tool image"
+	@echo "  shell-build      - Build shell tool image"
+	@echo "  shell-push       - Push shell tool image"
 
 # Compile index.yaml from all tool manifests
 build:
@@ -44,6 +52,10 @@ build-all:
 	@$(MAKE) -C email build
 	@$(MAKE) -C web build
 	@$(MAKE) -C filesystem build
+	@$(MAKE) -C thinking build
+	@$(MAKE) -C memory build
+	@$(MAKE) -C time build
+	@$(MAKE) -C shell build
 	@echo "✓ All tools built successfully"
 
 # Push all tool images
@@ -53,6 +65,10 @@ push-all:
 	@$(MAKE) -C email push
 	@$(MAKE) -C web push
 	@$(MAKE) -C filesystem push
+	@$(MAKE) -C thinking push
+	@$(MAKE) -C memory push
+	@$(MAKE) -C time push
+	@$(MAKE) -C shell push
 	@echo "✓ All tools pushed successfully"
 
 # Individual tool targets
@@ -79,4 +95,28 @@ filesystem-build:
 
 filesystem-push:
 	@$(MAKE) -C filesystem push
+
+thinking-build:
+	@$(MAKE) -C thinking build
+
+thinking-push:
+	@$(MAKE) -C thinking push
+
+memory-build:
+	@$(MAKE) -C memory build
+
+memory-push:
+	@$(MAKE) -C memory push
+
+time-build:
+	@$(MAKE) -C time build
+
+time-push:
+	@$(MAKE) -C time push
+
+shell-build:
+	@$(MAKE) -C shell build
+
+shell-push:
+	@$(MAKE) -C shell push
 

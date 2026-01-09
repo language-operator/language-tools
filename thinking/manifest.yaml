@@ -1,0 +1,13 @@
+name: thinking
+displayName: Sequential Thinking Tool
+description: Dynamic and reflective problem-solving through structured thinking process - analyze complex problems step-by-step with revision capabilities
+image: ghcr.io/language-operator/thinking-tool:latest
+deploymentMode: service
+port: 80
+type: mcp
+
+# No special RBAC or egress requirements - pure reasoning tool
+aliases:
+  - sequential
+  - reasoning
+  - analysis

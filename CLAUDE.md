@@ -16,7 +16,7 @@ make build-all
 
 # Build a single tool (note: some tools use different directory names)
 cd <tool-name> && make build
-# Available tools: web, email, k8s, filesystem
+# Available tools: web, email, k8s, filesystem, thinking, memory, time, shell
 
 # Compile tool registry index from manifests
 make build
@@ -31,7 +31,7 @@ make clean
 ### Individual Tool Development
 
 ```bash
-# Navigate to any tool directory (web/, email/, k8s/, filesystem/)
+# Navigate to any tool directory (web/, email/, k8s/, filesystem/, thinking/, memory/, time/, shell/)
 cd web/
 
 # Run unit tests (must be in tool directory)
@@ -89,7 +89,7 @@ curl -X POST http://localhost:8080/mcp \
 ### Repository Structure
 
 - **Root level**: `Makefile` for building all tools, `index.yaml` (generated tool registry), `tools.mk` (shared Makefile)
-- **Tool directories**: `web/`, `email/`, `k8s/`, `filesystem/` - each contains a complete MCP server
+- **Tool directories**: `web/`, `email/`, `k8s/`, `filesystem/`, `thinking/`, `memory/`, `time/`, `shell/` - each contains a complete MCP server
 - **scripts/**: `compile-index.rb` - generates the unified tool registry from individual manifests
 
 ### Individual Tool Structure
@@ -144,6 +144,10 @@ end
 2. **email**: SMTP email sending, configuration testing 
 3. **k8s**: Full Kubernetes API access, pod operations, resource CRUD
 4. **filesystem**: Advanced file operations using official MCP filesystem server (17 tools)
+5. **thinking**: Sequential thinking and structured reasoning (official MCP server wrapper)
+6. **memory**: Persistent knowledge graph with entities, relations, and observations (official MCP server wrapper)
+7. **time**: Time and timezone conversion using IANA timezone names (official MCP server wrapper)
+8. **shell**: Secure shell command execution with directory restrictions and timeout controls
 
 ### MCP Protocol Implementation
 
@@ -185,6 +189,30 @@ The `language-operator` Ruby gem provides:
 - Full Kubernetes API access for cluster operations
 - Pod management, resource CRUD operations
 - Requires appropriate RBAC permissions
+
+### Thinking Tool (`thinking/`)
+- Wraps official MCP sequential thinking server
+- Structured, step-by-step reasoning with revision capabilities
+- Dynamic problem-solving with branching logic and hypothesis testing
+- No external dependencies - pure reasoning tool
+
+### Memory Tool (`memory/`)
+- Wraps official MCP memory server with knowledge graph capabilities
+- Persistent entity-relationship storage using JSONL format
+- Enables agents to remember information across conversations
+- Deployed as sidecar with persistent volume for memory retention
+
+### Time Tool (`time/`)
+- Wraps official MCP time server with timezone conversion capabilities
+- IANA timezone support with automatic DST handling
+- Current time queries and timezone conversions
+- No external dependencies - pure time calculation tool
+
+### Shell Tool (`shell/`)
+- Secure bash command execution using shell-mcp-server
+- Directory restrictions to `/workspace` and `/tmp` only
+- 30-second timeout protection for all commands
+- Common CLI tools pre-installed (curl, wget, git, jq)
 
 ## Development Workflow
 

@@ -1,6 +1,6 @@
 ---
 version: '1.0'
-generated: '2026-01-09T03:39:19Z'
+generated: '2026-01-09T04:29:32Z'
 tools:
   email:
     name: email
@@ -93,6 +93,49 @@ tools:
       ports:
       - port: 443
         protocol: TCP
+  memory:
+    name: memory
+    displayName: Knowledge Graph Memory Tool
+    description: Persistent memory using knowledge graph with entities, relations,
+      and observations - enables agents to remember and recall information across
+      conversations
+    image: ghcr.io/language-operator/memory-tool:latest
+    deploymentMode: sidecar
+    port: 80
+    type: mcp
+    volumes:
+    - name: workspace
+      mountPath: "/workspace"
+  shell:
+    name: shell
+    displayName: Shell Command Tool
+    description: Secure shell command execution with directory restrictions and timeout
+      controls - enables agents to run bash commands safely
+    image: ghcr.io/language-operator/shell-tool:latest
+    deploymentMode: sidecar
+    port: 80
+    type: mcp
+    volumes:
+    - name: workspace
+      mountPath: "/workspace"
+  thinking:
+    name: thinking
+    displayName: Sequential Thinking Tool
+    description: Dynamic and reflective problem-solving through structured thinking
+      process - analyze complex problems step-by-step with revision capabilities
+    image: ghcr.io/language-operator/thinking-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
+  time:
+    name: time
+    displayName: Time and Timezone Tool
+    description: Time and timezone conversion capabilities using IANA timezone names
+      with automatic system timezone detection
+    image: ghcr.io/language-operator/time-tool:latest
+    deploymentMode: service
+    port: 80
+    type: mcp
   web:
     name: web
     displayName: Web Tool

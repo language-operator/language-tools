@@ -1,0 +1,18 @@
+name: memory
+displayName: Knowledge Graph Memory Tool
+description: Persistent memory using knowledge graph with entities, relations, and observations - enables agents to remember and recall information across conversations
+image: ghcr.io/language-operator/memory-tool:latest
+deploymentMode: sidecar
+port: 80
+type: mcp
+
+# Requires persistent volume for memory storage
+volumes:
+  - name: workspace
+    mountPath: "/workspace"
+
+# No special RBAC requirements - file-based storage only
+aliases:
+  - knowledge
+  - kg
+  - recall

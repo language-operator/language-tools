@@ -1,0 +1,13 @@
+name: time
+displayName: Time and Timezone Tool
+description: Time and timezone conversion capabilities using IANA timezone names with automatic system timezone detection
+image: ghcr.io/language-operator/time-tool:latest
+deploymentMode: service
+port: 80
+type: mcp
+
+# No special RBAC or egress requirements - pure time calculation tool
+aliases:
+  - timezone
+  - clock
+  - temporal
