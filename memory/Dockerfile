@@ -1,8 +1,7 @@
 FROM mcp/memory:latest
 
-# Install Python for HTTP bridge
-RUN apt-get update && apt-get install -y python3 && \
-    rm -rf /var/lib/apt/lists/*
+# Install Python for HTTP bridge (Alpine uses apk)
+RUN apk add --no-cache python3
 
 # Copy HTTP bridge (uses Python standard library only)
 COPY http-bridge.py /app/http-bridge.py
