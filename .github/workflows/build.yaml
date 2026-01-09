@@ -22,7 +22,7 @@ env:
   IMAGE_PREFIX: language-operator
 
 jobs:
-  # Build tool images (k8s, web, email, workspace, mcp, cron)
+  # Build tool images (k8s, web, email, workspace, filesystem, mcp, cron)
   build-tools:
     runs-on: ubuntu-latest
     permissions:
@@ -30,7 +30,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        tool: [k8s, web, email, workspace, mcp, cron]
+        tool: [k8s, web, email, workspace, filesystem, mcp, cron]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

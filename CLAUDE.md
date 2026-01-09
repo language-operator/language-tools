@@ -14,8 +14,9 @@ This is the Language Operator Tools repository - a collection of MCP (Model Cont
 # Build all tools
 make build-all
 
-# Build a single tool
+# Build a single tool (note: some tools use different directory names)
 cd <tool-name> && make build
+# Available tools: web, email, cron, k8s, mcp, workspace
 
 # Compile tool registry index from manifests
 make build
@@ -33,7 +34,7 @@ make clean
 # Navigate to any tool directory (web/, email/, cron/, k8s/, mcp/, workspace/)
 cd web/
 
-# Run unit tests
+# Run unit tests (must be in tool directory)
 make spec
 # or: bundle exec rspec
 
@@ -49,7 +50,7 @@ make lint-fix
 make build
 make run
 
-# Test tool endpoints (web tool example)
+# Test tool endpoints (requires running server)
 make test
 
 # Generate documentation
@@ -191,6 +192,11 @@ The `language-operator` Ruby gem provides:
 - Discovers other tools via LanguageTool CRD queries
 - Enables dynamic tool composition
 
+### K8s Tool (`k8s/`)
+- Full Kubernetes API access for cluster operations
+- Pod management, resource CRUD operations
+- Requires appropriate RBAC permissions
+
 ## Development Workflow
 
 1. Make changes to tool implementations in `tools/*.rb`
@@ -201,3 +207,10 @@ The `language-operator` Ruby gem provides:
 6. Rebuild index with `make build` (compiles all manifests into `index.yaml`)
 
 Always run linting and tests before committing. The repository uses RuboCop for code style and RSpec for unit testing.
+
+## Important Notes
+
+- **Directory Structure**: The Makefile refers to a `filesystem` tool, but the actual directory is named `workspace`
+- **Dependencies**: All tools depend on the `language-operator` gem which provides the core SDK
+- **Testing**: Each tool has integration tests that verify MCP protocol compliance
+- **Documentation**: Tools support YARD documentation generation via `make doc`

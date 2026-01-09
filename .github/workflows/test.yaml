@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # Note: filesystem tool excluded as it's a pure Docker wrapper without Ruby tests
         tool: [k8s, web, email, workspace, mcp, cron]
     steps:
       - name: Checkout code
