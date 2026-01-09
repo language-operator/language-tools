@@ -199,14 +199,19 @@ The `language-operator` Ruby gem provides:
 
 ## Development Workflow
 
-1. Make changes to tool implementations in `tools/*.rb`
-2. Update tests in `spec/tools/*_spec.rb`
-3. Run `make spec` and `make lint` to validate changes
-4. Test locally with `make build && make run && make test`
-5. Update `manifest.yaml` if adding new egress rules or RBAC requirements
-6. Rebuild index with `make build` (compiles all manifests into `index.yaml`)
+1. **First-time setup**: Run `./.githooks/install-hooks.sh` to install git hooks
+2. Make changes to tool implementations in `tools/*.rb`
+3. Update tests in `spec/tools/*_spec.rb`
+4. Run `make spec` and `make lint` to validate changes
+5. Test locally with `make build && make run && make test`
+6. Update `manifest.yaml` if adding new egress rules or RBAC requirements
+7. Commit changes - `index.yaml` will be automatically rebuilt by pre-commit hook
 
 Always run linting and tests before committing. The repository uses RuboCop for code style and RSpec for unit testing.
+
+### Git Hooks
+
+The repository includes a pre-commit hook that automatically rebuilds `index.yaml` when `manifest.yaml` files change. This ensures the tool registry stays in sync with individual tool configurations.
 
 ## Important Notes
 

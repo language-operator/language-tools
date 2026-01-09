@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+echo "Pre-commit: Checking if tool manifests need rebuilding..."
+
+# Check if any manifest files have been staged
+if git diff --cached --name-only | grep -E "(manifest\.yaml|scripts/compile-index\.rb)$" > /dev/null; then
+    echo "Pre-commit: Tool manifests or compiler changed, rebuilding index.yaml..."
+    
+    # Rebuild the index
+    make build
+    
+    # Check if index.yaml changed
+    if ! git diff --exit-code index.yaml > /dev/null 2>&1; then
+        echo "Pre-commit: index.yaml was updated, staging changes..."
+        git add index.yaml
+        echo "Pre-commit: ✓ index.yaml rebuilt and staged"
+    else
+        echo "Pre-commit: ✓ index.yaml is already up-to-date"
+    fi
+else
+    echo "Pre-commit: ✓ No manifest changes detected, skipping rebuild"
+fi
+
+echo "Pre-commit: Complete"
