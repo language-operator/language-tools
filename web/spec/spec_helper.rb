@@ -17,10 +17,16 @@ require 'bundler/setup'
 require 'language_operator'
 require 'webmock/rspec'
 
-# Disable real HTTP connections
-WebMock.disable_net_connect!(allow_localhost: false)
+# Disable real HTTP connections - be more strict in CI
+WebMock.disable_net_connect!(allow_localhost: false, allow: [])
 
 RSpec.configure do |config|
+  # Reset WebMock before each test to ensure clean state
+  config.before(:each) do
+    WebMock.reset!
+    WebMock.disable_net_connect!(allow_localhost: false, allow: [])
+  end
+
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
