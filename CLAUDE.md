@@ -16,7 +16,7 @@ make build-all
 
 # Build a single tool (note: some tools use different directory names)
 cd <tool-name> && make build
-# Available tools: web, email, cron, k8s, mcp, workspace
+# Available tools: web, email, cron, k8s, filesystem
 
 # Compile tool registry index from manifests
 make build
@@ -31,7 +31,7 @@ make clean
 ### Individual Tool Development
 
 ```bash
-# Navigate to any tool directory (web/, email/, cron/, k8s/, mcp/, workspace/)
+# Navigate to any tool directory (web/, email/, cron/, k8s/, filesystem/)
 cd web/
 
 # Run unit tests (must be in tool directory)
@@ -89,7 +89,7 @@ curl -X POST http://localhost:8080/mcp \
 ### Repository Structure
 
 - **Root level**: `Makefile` for building all tools, `index.yaml` (generated tool registry), `tools.mk` (shared Makefile)
-- **Tool directories**: `web/`, `email/`, `cron/`, `k8s/`, `mcp/`, `workspace/` - each contains a complete MCP server
+- **Tool directories**: `web/`, `email/`, `cron/`, `k8s/`, `filesystem/` - each contains a complete MCP server
 - **scripts/**: `compile-index.rb` - generates the unified tool registry from individual manifests
 
 ### Individual Tool Structure
@@ -144,8 +144,7 @@ end
 2. **email**: SMTP email sending, configuration testing 
 3. **cron**: Self-scheduling, natural language cron parsing, LanguageAgent CRD management
 4. **k8s**: Full Kubernetes API access, pod operations, resource CRUD
-5. **workspace**: Persistent file I/O for agent state (`/workspace` directory)
-6. **mcp**: Meta-tool for discovering and calling other MCP servers
+5. **filesystem**: Advanced file operations using official MCP filesystem server (17 tools)
 
 ### MCP Protocol Implementation
 
@@ -182,15 +181,11 @@ The `language-operator` Ruby gem provides:
 - Modifies LanguageAgent CRDs to create schedules
 - Requires RBAC access to `languageagents` resources
 
-### Workspace Tool (`workspace/`)
+### Filesystem Tool (`filesystem/`)
+- Wraps official MCP filesystem server with 17 advanced tools
+- Features: edit_file with diffs, directory trees, media files, multi-file reads
 - Provides persistent file storage at `/workspace`
-- Sandboxed file operations, multi-agent coordination support
 - Deployed as sidecar with shared volume
-
-### MCP Bridge Tool (`mcp/`)
-- Universal client for any MCP server
-- Discovers other tools via LanguageTool CRD queries
-- Enables dynamic tool composition
 
 ### K8s Tool (`k8s/`)
 - Full Kubernetes API access for cluster operations

@@ -20,8 +20,8 @@ help:
 	@echo "  web-push         - Push web tool image"
 	@echo "  filesystem-build - Build filesystem tool image"
 	@echo "  filesystem-push  - Push filesystem tool image"
-	@echo "  mcp-build        - Build mcp tool image"
-	@echo "  mcp-push         - Push mcp tool image"
+	@echo "  cron-build       - Build cron tool image"
+	@echo "  cron-push        - Push cron tool image"
 
 # Compile index.yaml from all tool manifests
 build:
@@ -46,7 +46,7 @@ build-all:
 	@$(MAKE) -C email build
 	@$(MAKE) -C web build
 	@$(MAKE) -C filesystem build
-	@$(MAKE) -C mcp build
+	@$(MAKE) -C cron build
 	@echo "✓ All tools built successfully"
 
 # Push all tool images
@@ -56,7 +56,7 @@ push-all:
 	@$(MAKE) -C email push
 	@$(MAKE) -C web push
 	@$(MAKE) -C filesystem push
-	@$(MAKE) -C mcp push
+	@$(MAKE) -C cron push
 	@echo "✓ All tools pushed successfully"
 
 # Individual tool targets
@@ -84,8 +84,8 @@ filesystem-build:
 filesystem-push:
 	@$(MAKE) -C filesystem push
 
-mcp-build:
-	@$(MAKE) -C mcp build
+cron-build:
+	@$(MAKE) -C cron build
 
-mcp-push:
-	@$(MAKE) -C mcp push
+cron-push:
+	@$(MAKE) -C cron push
