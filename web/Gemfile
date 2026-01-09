@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'language-operator', '~> 0.1.71'
+gem 'language-operator', '~> 0.1.81'
 
 group :development, :test do
   gem 'rspec', '~> 3.13'
