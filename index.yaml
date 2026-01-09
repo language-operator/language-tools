@@ -1,6 +1,6 @@
 ---
 version: '1.0'
-generated: '2026-01-09T02:55:05Z'
+generated: '2026-01-09T02:58:24Z'
 tools:
   cron:
     name: cron
@@ -122,49 +122,6 @@ tools:
       ports:
       - port: 443
         protocol: TCP
-  mcp:
-    name: mcp
-    displayName: MCP Bridge Tool
-    description: Universal bridge to external MCP servers - discover and call tools
-      from the MCP ecosystem
-    image: ghcr.io/language-operator/mcp-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    rbac:
-      clusterRole:
-        rules:
-        - apiGroups:
-          - langop.io
-          resources:
-          - languagetools
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - ''
-          resources:
-          - namespaces
-          verbs:
-          - get
-          - list
-    egress:
-    - description: Allow access to all MCP servers in cluster
-      cidr: 10.0.0.0/8
-      ports:
-      - port: 80
-        protocol: TCP
-      - port: 443
-        protocol: TCP
-    - description: Allow DNS resolution
-      dns:
-      - "*.svc.cluster.local"
-      ports:
-      - port: 53
-        protocol: UDP
-      - port: 53
-        protocol: TCP
   web:
     name: web
     displayName: Web Tool
@@ -190,15 +147,3 @@ tools:
         protocol: TCP
       - port: 80
         protocol: TCP
-  workspace:
-    name: workspace
-    displayName: Workspace Tool
-    description: Persistent file I/O for agent workspace - read, write, and manage
-      files
-    image: ghcr.io/language-operator/workspace-tool:latest
-    deploymentMode: sidecar
-    port: 80
-    type: mcp
-    volumes:
-    - name: workspace
-      mountPath: "/workspace"
