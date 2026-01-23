@@ -1,31 +1,35 @@
-name: web
-displayName: Web
-description: Web search via DuckDuckGo, HTTP client with full method support, content fetching and parsing, status checking, and header inspection
-image: ghcr.io/language-operator/web-tool:latest
-deploymentMode: service
-port: 80
-type: mcp
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: web
+  labels:
+    langop.io/source: catalog
+  annotations:
+    langop.io/display-name: "Web"
+    langop.io/aliases: "web-search,web-fetch,http"
+spec:
+  description: Web search via DuckDuckGo, HTTP client with full method support, content fetching and parsing, status checking, and header inspection
+  image: ghcr.io/language-operator/web-tool:latest
+  deploymentMode: service
+  port: 80
+  type: mcp
 
-# Network egress configuration
-egress:
-  - description: Allow HTTPS to DuckDuckGo
-    dns:
-      - "*.duckduckgo.com"
-      - "duckduckgo.com"
-    ports:
-      - port: 443
-        protocol: TCP
-  - description: Allow HTTPS to any web destination
-    dns:
-      - "*"
-    ports:
-      - port: 443
-        protocol: TCP
-      - port: 80
-        protocol: TCP
-
-# Optional aliases for this tool
-aliases:
-  - web-search
-  - web-fetch
-  - http
+  # Network egress configuration
+  egress:
+    - description: Allow HTTPS to DuckDuckGo
+      to:
+        dns:
+          - "*.duckduckgo.com"
+          - "duckduckgo.com"
+      ports:
+        - port: 443
+          protocol: TCP
+    - description: Allow HTTPS to any web destination
+      to:
+        dns:
+          - "*"
+      ports:
+        - port: 443
+          protocol: TCP
+        - port: 80
+          protocol: TCP

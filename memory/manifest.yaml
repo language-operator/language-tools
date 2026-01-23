@@ -1,18 +1,22 @@
-name: memory
-displayName: Memory
-description: Persistent memory using knowledge graph with entities, relations, and observations - enables agents to remember and recall information across conversations
-image: ghcr.io/language-operator/memory-tool:latest
-deploymentMode: sidecar
-port: 80
-type: mcp
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: memory
+  labels:
+    langop.io/source: catalog
+  annotations:
+    langop.io/display-name: "Memory"
+    langop.io/aliases: "knowledge,kg,recall"
+spec:
+  description: Persistent memory using knowledge graph with entities, relations, and observations - enables agents to remember and recall information across conversations
+  image: ghcr.io/language-operator/memory-tool:latest
+  deploymentMode: sidecar
+  port: 80
+  type: mcp
 
-# Requires persistent volume for memory storage
-volumes:
-  - name: workspace
-    mountPath: "/workspace"
+  # Requires persistent volume for memory storage
+  volumes:
+    - name: workspace
+      mountPath: "/workspace"
 
-# No special RBAC requirements - file-based storage only
-aliases:
-  - knowledge
-  - kg
-  - recall
+  # No special RBAC requirements - file-based storage only

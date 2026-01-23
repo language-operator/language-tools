@@ -1,19 +1,23 @@
-name: shell
-displayName: Shell
-description: Secure shell command execution with directory restrictions and timeout controls - enables agents to run bash commands safely
-image: ghcr.io/language-operator/shell-tool:latest
-deploymentMode: sidecar
-port: 80
-type: mcp
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: shell
+  labels:
+    langop.io/source: catalog
+  annotations:
+    langop.io/display-name: "Shell"
+    langop.io/aliases: "bash,command,exec"
+spec:
+  description: Secure shell command execution with directory restrictions and timeout controls - enables agents to run bash commands safely
+  image: ghcr.io/language-operator/shell-tool:latest
+  deploymentMode: sidecar
+  port: 80
+  type: mcp
 
-# Requires workspace volume for command execution
-volumes:
-  - name: workspace
-    mountPath: "/workspace"
+  # Requires workspace volume for command execution
+  volumes:
+    - name: workspace
+      mountPath: "/workspace"
 
-# No special RBAC requirements - file-based execution only
-# Security is enforced through directory restrictions and timeout controls
-aliases:
-  - bash
-  - command
-  - exec
+  # No special RBAC requirements - file-based execution only
+  # Security is enforced through directory restrictions and timeout controls

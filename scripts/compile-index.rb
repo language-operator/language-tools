@@ -6,6 +6,12 @@ require 'pathname'
 
 # Script to compile tool manifests into a unified index.yaml
 # Usage: ruby scripts/compile-index.rb
+#
+# This script parses LanguageTool CRD manifests and generates an index
+# containing complete Kubernetes resources that can be:
+# 1. Applied directly to Kubernetes via kubectl
+# 2. Consumed by the dashboard without transformation
+# 3. Validated against CRD OpenAPI schema
 
 class ManifestCompiler
   OUTPUT_FILE = 'index.yaml'
@@ -43,10 +49,12 @@ class ManifestCompiler
 
       begin
         manifest = YAML.load_file(manifest_path)
-        tool_name = manifest['name']
+
+        # Extract tool name from metadata.name (CRD format)
+        tool_name = manifest.dig('metadata', 'name')
 
         if tool_name.nil? || tool_name.empty?
-          @errors << "Tool in #{dir}/ has no 'name' field in manifest.yaml"
+          @errors << "Tool in #{dir}/ has no 'metadata.name' field in manifest.yaml"
           next
         end
 
@@ -64,25 +72,64 @@ class ManifestCompiler
   end
 
   def validate_manifests
-    required_fields = %w[name displayName description image deploymentMode port type]
-
     @tools.each do |name, manifest|
+      # Validate CRD structure
+      unless manifest['apiVersion'] == 'langop.io/v1alpha1'
+        @errors << "Tool '#{name}' has invalid or missing apiVersion (expected 'langop.io/v1alpha1')"
+      end
+
+      unless manifest['kind'] == 'LanguageTool'
+        @errors << "Tool '#{name}' has invalid or missing kind (expected 'LanguageTool')"
+      end
+
+      # Validate metadata
+      unless manifest['metadata']
+        @errors << "Tool '#{name}' missing metadata section"
+        next
+      end
+
+      # Validate spec section
+      unless manifest['spec']
+        @errors << "Tool '#{name}' missing spec section"
+        next
+      end
+
+      spec = manifest['spec']
+      required_fields = %w[description image deploymentMode port type]
+
       required_fields.each do |field|
-        unless manifest.key?(field)
-          @errors << "Tool '#{name}' missing required field: #{field}"
+        unless spec.key?(field)
+          @errors << "Tool '#{name}' missing required spec field: #{field}"
         end
       end
 
       # Validate deployment mode
       valid_modes = %w[service job sidecar]
-      if manifest['deploymentMode'] && !valid_modes.include?(manifest['deploymentMode'])
-        @errors << "Tool '#{name}' has invalid deploymentMode: #{manifest['deploymentMode']}"
+      if spec['deploymentMode'] && !valid_modes.include?(spec['deploymentMode'])
+        @errors << "Tool '#{name}' has invalid deploymentMode: #{spec['deploymentMode']}"
       end
 
       # Validate type
       valid_types = %w[mcp stdio http]
-      if manifest['type'] && !valid_types.include?(manifest['type'])
-        @errors << "Tool '#{name}' has invalid type: #{manifest['type']}"
+      if spec['type'] && !valid_types.include?(spec['type'])
+        @errors << "Tool '#{name}' has invalid type: #{spec['type']}"
+      end
+
+      # Validate egress format (if present)
+      if spec['egress']
+        spec['egress'].each_with_index do |rule, index|
+          # Check if DNS is directly under the rule (old format - should fail)
+          if rule['dns'] && !rule['to']
+            @errors << "Tool '#{name}' egress rule ##{index} uses old format - 'dns' must be under 'to' wrapper"
+          end
+
+          # Validate new format structure
+          if rule['to']
+            unless rule['to'].is_a?(Hash)
+              @errors << "Tool '#{name}' egress rule ##{index} 'to' must be an object"
+            end
+          end
+        end
       end
     end
   end
@@ -95,14 +142,15 @@ class ManifestCompiler
     }
 
     @tools.each do |name, manifest|
-      # Add the main tool entry (strip out aliases field since we don't use it)
-      @index['tools'][name] = manifest.reject { |k| k == 'aliases' }
+      # Store the complete LanguageTool CRD resource
+      # This allows the index to be used directly with kubectl or consumed by dashboards
+      @index['tools'][name] = manifest
     end
   end
 
   def write_output
-    # Write YAML with proper formatting to avoid 'alias' keyword conflicts
-    # Some YAML parsers (like Go's yaml.v2/v3) treat 'alias:' as a special keyword
+    # Generate index with complete LanguageTool resources
+    # The output can be split and applied to Kubernetes or consumed as-is
     yaml_content = @index.to_yaml
     File.write(OUTPUT_FILE, yaml_content)
   end

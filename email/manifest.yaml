@@ -1,24 +1,29 @@
-name: email
-displayName: Email
-description: Send and receive emails via SMTP/IMAP
-image: ghcr.io/language-operator/email-tool:latest
-deploymentMode: service
-port: 80
-type: mcp
-authRequired: true
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: email
+  labels:
+    langop.io/source: catalog
+  annotations:
+    langop.io/display-name: "Email"
+spec:
+  description: Send and receive emails via SMTP/IMAP
+  image: ghcr.io/language-operator/email-tool:latest
+  deploymentMode: service
+  port: 80
+  type: mcp
+  authRequired: true
 
-# Network egress configuration
-egress:
-  - description: Allow SMTP/IMAP connections
-    dns:
-      - "*"
-    ports:
-      - port: 587
-        protocol: TCP
-      - port: 465
-        protocol: TCP
-      - port: 993
-        protocol: TCP
-
-# Optional aliases for this tool
-aliases: []
+  # Network egress configuration
+  egress:
+    - description: Allow SMTP/IMAP connections
+      to:
+        dns:
+          - "*"
+      ports:
+        - port: 587
+          protocol: TCP
+        - port: 465
+          protocol: TCP
+        - port: 993
+          protocol: TCP

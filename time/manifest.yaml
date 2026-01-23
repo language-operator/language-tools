@@ -1,13 +1,17 @@
-name: time
-displayName: Time
-description: Time and timezone conversion capabilities using IANA timezone names with automatic system timezone detection
-image: ghcr.io/language-operator/time-tool:latest
-deploymentMode: service
-port: 80
-type: mcp
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: time
+  labels:
+    langop.io/source: catalog
+  annotations:
+    langop.io/display-name: "Time"
+    langop.io/aliases: "timezone,clock,temporal"
+spec:
+  description: Time and timezone conversion capabilities using IANA timezone names with automatic system timezone detection
+  image: ghcr.io/language-operator/time-tool:latest
+  deploymentMode: service
+  port: 80
+  type: mcp
 
-# No special RBAC or egress requirements - pure time calculation tool
-aliases:
-  - timezone
-  - clock
-  - temporal
+  # No special RBAC or egress requirements - pure time calculation tool

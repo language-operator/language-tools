@@ -1,12 +1,19 @@
-name: filesystem
-displayName: Filesystem
-description: Official MCP filesystem server with advanced file operations - edit_file with diffs, directory trees, media files, multiple file reads, and dynamic access control
-image: ghcr.io/language-operator/filesystem-tool:latest
-deploymentMode: sidecar
-port: 80
-type: mcp
+apiVersion: langop.io/v1alpha1
+kind: LanguageTool
+metadata:
+  name: filesystem
+  labels:
+    langop.io/source: catalog
+  annotations:
+    langop.io/display-name: "Filesystem"
+spec:
+  description: Official MCP filesystem server with advanced file operations - edit_file with diffs, directory trees, media files, multiple file reads, and dynamic access control
+  image: ghcr.io/language-operator/filesystem-tool:latest
+  deploymentMode: sidecar
+  port: 80
+  type: mcp
 
-# Volume configuration for persistent workspace
-volumes:
-  - name: workspace
-    mountPath: /workspace
+  # Volume configuration for persistent workspace
+  volumes:
+    - name: workspace
+      mountPath: /workspace

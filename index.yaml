@@ -1,163 +1,187 @@
 ---
 version: '1.0'
-generated: '2026-01-09T04:35:42Z'
+generated: '2026-01-23T04:08:48Z'
 tools:
   email:
-    name: email
-    displayName: Email
-    description: Send and receive emails via SMTP/IMAP
-    image: ghcr.io/language-operator/email-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    authRequired: true
-    egress:
-    - description: Allow SMTP/IMAP connections
-      dns:
-      - "*"
-      ports:
-      - port: 587
-        protocol: TCP
-      - port: 465
-        protocol: TCP
-      - port: 993
-        protocol: TCP
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: email
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Email
+    spec:
+      description: Send and receive emails via SMTP/IMAP
+      image: ghcr.io/language-operator/email-tool:latest
+      deploymentMode: service
+      port: 80
+      type: mcp
+      authRequired: true
+      egress:
+      - description: Allow SMTP/IMAP connections
+        to:
+          dns:
+          - "*"
+        ports:
+        - port: 587
+          protocol: TCP
+        - port: 465
+          protocol: TCP
+        - port: 993
+          protocol: TCP
   filesystem:
-    name: filesystem
-    displayName: Filesystem
-    description: Official MCP filesystem server with advanced file operations - edit_file
-      with diffs, directory trees, media files, multiple file reads, and dynamic access
-      control
-    image: ghcr.io/language-operator/filesystem-tool:latest
-    deploymentMode: sidecar
-    port: 80
-    type: mcp
-    volumes:
-    - name: workspace
-      mountPath: "/workspace"
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: filesystem
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Filesystem
+    spec:
+      description: Official MCP filesystem server with advanced file operations -
+        edit_file with diffs, directory trees, media files, multiple file reads, and
+        dynamic access control
+      image: ghcr.io/language-operator/filesystem-tool:latest
+      deploymentMode: sidecar
+      port: 80
+      type: mcp
+      volumes:
+      - name: workspace
+        mountPath: "/workspace"
   k8s:
-    name: k8s
-    displayName: Kubernetes
-    description: Native Kubernetes operations - manage resources, pods, logs, and
-      CRDs
-    image: ghcr.io/language-operator/k8s-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    rbac:
-      clusterRole:
-        rules:
-        - apiGroups:
-          - "*"
-          resources:
-          - "*"
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - ''
-          resources:
-          - pods
-          - services
-          - configmaps
-          - secrets
-          verbs:
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - apps
-          resources:
-          - deployments
-          - statefulsets
-          - daemonsets
-          verbs:
-          - create
-          - update
-          - patch
-          - delete
-        - apiGroups:
-          - ''
-          resources:
-          - pods/log
-          - pods/exec
-          verbs:
-          - get
-          - create
-    egress:
-    - description: Allow access to Kubernetes API server
-      dns:
-      - kubernetes.default.svc.cluster.local
-      ports:
-      - port: 443
-        protocol: TCP
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: k8s
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Kubernetes
+        langop.io/aliases: kubectl,kubernetes
+    spec:
+      description: Native Kubernetes operations - manage resources, pods, logs, and
+        CRDs
+      image: ghcr.io/language-operator/k8s-tool:latest
+      deploymentMode: service
+      port: 80
+      type: mcp
+      egress:
+      - description: Allow access to Kubernetes API server
+        to:
+          dns:
+          - kubernetes.default.svc.cluster.local
+        ports:
+        - port: 443
+          protocol: TCP
   memory:
-    name: memory
-    displayName: Memory
-    description: Persistent memory using knowledge graph with entities, relations,
-      and observations - enables agents to remember and recall information across
-      conversations
-    image: ghcr.io/language-operator/memory-tool:latest
-    deploymentMode: sidecar
-    port: 80
-    type: mcp
-    volumes:
-    - name: workspace
-      mountPath: "/workspace"
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: memory
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Memory
+        langop.io/aliases: knowledge,kg,recall
+    spec:
+      description: Persistent memory using knowledge graph with entities, relations,
+        and observations - enables agents to remember and recall information across
+        conversations
+      image: ghcr.io/language-operator/memory-tool:latest
+      deploymentMode: sidecar
+      port: 80
+      type: mcp
+      volumes:
+      - name: workspace
+        mountPath: "/workspace"
   shell:
-    name: shell
-    displayName: Shell
-    description: Secure shell command execution with directory restrictions and timeout
-      controls - enables agents to run bash commands safely
-    image: ghcr.io/language-operator/shell-tool:latest
-    deploymentMode: sidecar
-    port: 80
-    type: mcp
-    volumes:
-    - name: workspace
-      mountPath: "/workspace"
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: shell
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Shell
+        langop.io/aliases: bash,command,exec
+    spec:
+      description: Secure shell command execution with directory restrictions and
+        timeout controls - enables agents to run bash commands safely
+      image: ghcr.io/language-operator/shell-tool:latest
+      deploymentMode: sidecar
+      port: 80
+      type: mcp
+      volumes:
+      - name: workspace
+        mountPath: "/workspace"
   thinking:
-    name: thinking
-    displayName: Sequential Thinking
-    description: Dynamic and reflective problem-solving through structured thinking
-      process - analyze complex problems step-by-step with revision capabilities
-    image: ghcr.io/language-operator/thinking-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: thinking
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Sequential Thinking
+        langop.io/aliases: sequential,reasoning,analysis
+    spec:
+      description: Dynamic and reflective problem-solving through structured thinking
+        process - analyze complex problems step-by-step with revision capabilities
+      image: ghcr.io/language-operator/thinking-tool:latest
+      deploymentMode: service
+      port: 80
+      type: mcp
   time:
-    name: time
-    displayName: Time
-    description: Time and timezone conversion capabilities using IANA timezone names
-      with automatic system timezone detection
-    image: ghcr.io/language-operator/time-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: time
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Time
+        langop.io/aliases: timezone,clock,temporal
+    spec:
+      description: Time and timezone conversion capabilities using IANA timezone names
+        with automatic system timezone detection
+      image: ghcr.io/language-operator/time-tool:latest
+      deploymentMode: service
+      port: 80
+      type: mcp
   web:
-    name: web
-    displayName: Web
-    description: Web search via DuckDuckGo, HTTP client with full method support,
-      content fetching and parsing, status checking, and header inspection
-    image: ghcr.io/language-operator/web-tool:latest
-    deploymentMode: service
-    port: 80
-    type: mcp
-    egress:
-    - description: Allow HTTPS to DuckDuckGo
-      dns:
-      - "*.duckduckgo.com"
-      - duckduckgo.com
-      ports:
-      - port: 443
-        protocol: TCP
-    - description: Allow HTTPS to any web destination
-      dns:
-      - "*"
-      ports:
-      - port: 443
-        protocol: TCP
-      - port: 80
-        protocol: TCP
+    apiVersion: langop.io/v1alpha1
+    kind: LanguageTool
+    metadata:
+      name: web
+      labels:
+        langop.io/source: catalog
+      annotations:
+        langop.io/display-name: Web
+        langop.io/aliases: web-search,web-fetch,http
+    spec:
+      description: Web search via DuckDuckGo, HTTP client with full method support,
+        content fetching and parsing, status checking, and header inspection
+      image: ghcr.io/language-operator/web-tool:latest
+      deploymentMode: service
+      port: 80
+      type: mcp
+      egress:
+      - description: Allow HTTPS to DuckDuckGo
+        to:
+          dns:
+          - "*.duckduckgo.com"
+          - duckduckgo.com
+        ports:
+        - port: 443
+          protocol: TCP
+      - description: Allow HTTPS to any web destination
+        to:
+          dns:
+          - "*"
+        ports:
+        - port: 443
+          protocol: TCP
+        - port: 80
+          protocol: TCP
