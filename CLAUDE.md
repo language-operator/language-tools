@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the Language Operator Tools repository - a collection of MCP (Model Context Protocol) servers that provide specialized capabilities to Language Operator agents. Each tool is implemented as a standalone Ruby service packaged as a Docker container that exposes MCP protocol endpoints.
+This is the Language Operator Tools repository - a collection of MCP (Model Context Protocol) servers that provide specialized capabilities to Language Operator agents. Each tool is packaged as a Docker container that exposes MCP protocol endpoints. Tools fall into two categories:
+
+1. **Ruby-based tools** (`web`, `email`, `k8s`): Custom implementations using the Language Operator Ruby SDK
+2. **Wrapper tools** (`filesystem`, `thinking`, `memory`, `time`, `shell`): Official MCP servers wrapped with Python HTTP bridges to convert stdio to HTTP/JSON-RPC
 
 ## Key Commands
 
@@ -34,11 +37,17 @@ make clean
 # Navigate to any tool directory (web/, email/, k8s/, filesystem/, thinking/, memory/, time/, shell/)
 cd web/
 
-# Run unit tests (must be in tool directory)
+# Run unit tests (must be in tool directory, Ruby-based tools only)
 make spec
 # or: bundle exec rspec
 
-# Run linting
+# Run a single test file
+bundle exec rspec spec/tools/web_fetch_spec.rb
+
+# Run a specific test
+bundle exec rspec spec/tools/web_fetch_spec.rb:42
+
+# Run linting (Ruby-based tools only)
 make lint
 # or: bundle exec rubocop
 
@@ -94,7 +103,7 @@ curl -X POST http://localhost:8080/mcp \
 
 ### Individual Tool Structure
 
-Each tool directory follows this pattern:
+**Ruby-based tools** (`web`, `email`, `k8s`) follow this pattern:
 
 ```
 tool-name/
@@ -110,9 +119,20 @@ tool-name/
         └── *_spec.rb
 ```
 
+**Wrapper tools** (`filesystem`, `thinking`, `memory`, `time`, `shell`) follow a simpler pattern:
+
+```
+tool-name/
+├── Dockerfile           # Extends official MCP image, adds Python bridge
+├── http-bridge.py       # Python script to convert stdio MCP to HTTP/JSON-RPC
+├── Makefile            # Includes ../tools.mk for standard targets
+├── manifest.yaml       # Tool metadata, deployment config, RBAC, egress rules
+└── README.md           # Tool-specific documentation
+```
+
 ### Tool Implementation Pattern
 
-Tools are implemented using the Language Operator Ruby SDK's declarative DSL:
+**Ruby-based tools** are implemented using the Language Operator Ruby SDK's declarative DSL:
 
 ```ruby
 # In tools/*.rb files
@@ -132,22 +152,31 @@ tool "tool_name" do
     # - LanguageOperator::Kubernetes::Client for K8s API
     # - LanguageOperator::Dsl::HTTP for HTTP requests
     # - Helper modules for shared logic
-    
+
     "Result: #{params['param_name']}"
   end
 end
 ```
 
+**Wrapper tools** use official MCP servers with a Python HTTP bridge (`http-bridge.py`) that:
+- Starts the official MCP server as a subprocess with stdio communication
+- Exposes an HTTP endpoint on port 80 that accepts JSON-RPC requests
+- Forwards requests to the stdio MCP server and returns responses
+- Uses only Python standard library (no dependencies)
+
 ### Available Tools
 
-1. **web**: Web search (DuckDuckGo), HTTP client, content fetching and parsing
-2. **email**: SMTP email sending, configuration testing 
+**Ruby-based tools:**
+1. **web**: Web search (DuckDuckGo), HTTP client, content fetching and parsing (7 MCP tools)
+2. **email**: SMTP email sending, configuration testing (3 MCP tools)
 3. **k8s**: Full Kubernetes API access, pod operations, resource CRUD
-4. **filesystem**: Advanced file operations using official MCP filesystem server (17 tools)
-5. **thinking**: Sequential thinking and structured reasoning (official MCP server wrapper)
-6. **memory**: Persistent knowledge graph with entities, relations, and observations (official MCP server wrapper)
-7. **time**: Time and timezone conversion using IANA timezone names (official MCP server wrapper)
-8. **shell**: Secure shell command execution with directory restrictions and timeout controls
+
+**Wrapper tools (official MCP servers):**
+4. **filesystem**: Advanced file operations using official MCP filesystem server (17 tools: edit_file with diffs, directory trees, media files, multi-file reads)
+5. **thinking**: Sequential thinking and structured reasoning from official MCP sequential thinking server
+6. **memory**: Persistent knowledge graph with entities, relations, and observations from official MCP memory server
+7. **time**: Time and timezone conversion using IANA timezone names from official MCP time server
+8. **shell**: Secure shell command execution via shell-mcp-server with directory restrictions (`/workspace`, `/tmp`) and 30-second timeout
 
 ### MCP Protocol Implementation
 
@@ -217,20 +246,26 @@ The `language-operator` Ruby gem provides:
 ## Development Workflow
 
 1. **First-time setup**: Run `./.githooks/install-hooks.sh` to install git hooks
-2. Make changes to tool implementations in `tools/*.rb`
-3. Update tests in `spec/tools/*_spec.rb`
-4. Run `make spec` and `make lint` to validate changes
-5. Test locally with `make build && make run && make test`
-6. Update `manifest.yaml` if adding new egress rules or RBAC requirements
-7. Commit changes - `index.yaml` will be automatically rebuilt by pre-commit hook
+2. **For Ruby-based tools** (`web`, `email`, `k8s`):
+   - Make changes to tool implementations in `tools/*.rb`
+   - Update tests in `spec/tools/*_spec.rb`
+   - Run `make spec` and `make lint` to validate changes
+3. **For wrapper tools** (`filesystem`, `thinking`, `memory`, `time`, `shell`):
+   - Modify `Dockerfile` to update base image versions
+   - Update `http-bridge.py` only if changing the bridge logic (rare)
+   - No unit tests (relies on official MCP server tests)
+4. Test locally with `make build && make run && make test`
+5. Update `manifest.yaml` if adding new egress rules or RBAC requirements
+6. Commit changes - `index.yaml` will be automatically rebuilt by pre-commit hook
 
-Always run linting and tests before committing. The repository uses RuboCop for code style and RSpec for unit testing.
+Always run linting and tests (for Ruby tools) before committing. The repository uses RuboCop for code style and RSpec for unit testing.
 
 ### Git Hooks
 
 The repository includes a pre-commit hook that automatically rebuilds `index.yaml` when `manifest.yaml` files change. This ensures the tool registry stays in sync with individual tool configurations.
 
 ## Important Notes
-- **Dependencies**: All tools depend on the `language-operator` gem which provides the core SDK
-- **Testing**: Each tool has integration tests that verify MCP protocol compliance
-- **Documentation**: Tools support YARD documentation generation via `make doc`
+- **Dependencies**: Ruby-based tools depend on the `language-operator` gem which provides the core SDK. Wrapper tools only depend on Python 3 standard library and the official MCP server they wrap.
+- **Testing**: Ruby-based tools have RSpec unit tests. Wrapper tools rely on official MCP server tests.
+- **Documentation**: Ruby-based tools support YARD documentation generation via `make doc`
+- **HTTP Bridge**: Wrapper tools use a lightweight Python script (`http-bridge.py`) to convert stdio MCP protocol to HTTP/JSON-RPC, enabling them to work with Language Operator's HTTP-based architecture
